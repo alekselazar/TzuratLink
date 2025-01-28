@@ -1,6 +1,6 @@
 # TzuratLink: A Comprehensive Platform for Digital Talmud Study
 
-[Powered by Sefaria](https://camo.githubusercontent.com/ab55fa936da3be90f34d670ef264e00526430ccadec2316e5fe18826f98dcdbe/68747470733a2f2f7777772e736566617269612e6f72672f7374617469632f696d672f706f77657265642d62792d736566617269612d62616467652e706e673f6d "bage")
+[Powered by Sefaria](/static/img/sefaria-badge.png)
 
 ## Introduction
 
