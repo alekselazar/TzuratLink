@@ -1,6 +1,6 @@
 # TzuratLink: A Comprehensive Platform for Digital Talmud Study
 
-[Powered by Sefaria](/static/img/sefaria-badge.png)
+![Powered by Sefaria](/static/img/sefaria-badge.png)
 
 ## Introduction
 
