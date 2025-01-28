@@ -10,3 +10,5 @@ settings.py
 *.json
 settings.py
 __init__.py
+manage.py
+fix.py
