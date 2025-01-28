@@ -1,0 +1,12 @@
+node_modules/
+webpack/
+__pycache__/
+migrations/
+
+.env
+*.sqlite3
+settings.py
+.babelrc
+*.json
+settings.py
+__init__.py

@@ -1,0 +1,31 @@
+.boxes-layer, .edited-layer {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+}
+
+.boxes-layer {
+    z-index: 2;
+}
+
+.edited-box {
+    background-color: green;
+    border: 1px solid green;
+    box-sizing: border-box;
+    opacity: 0.7;
+    position: absolute;
+}
+
+.highlighted-box {
+    background-color: blue;
+    border: 1px solid blue;
+    box-sizing: border-box;
+    opacity: 0.3;
+    position: absolute;
+}
+
+.selected {
+    background-color: green;
+}
