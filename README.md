@@ -1,5 +1,7 @@
 # TzuratLink: A Comprehensive Platform for Digital Talmud Study
 
+[Powered by Sefaria](https://camo.githubusercontent.com/ab55fa936da3be90f34d670ef264e00526430ccadec2316e5fe18826f98dcdbe/68747470733a2f2f7777772e736566617269612e6f72672f7374617469632f696d672f706f77657265642d62792d736566617269612d62616467652e706e673f6d "bage")
+
 ## Introduction
 
 TzuratLink represents a groundbreaking endeavor to integrate the meticulous study of the Talmud with the vast digital resources available through [Sefaria](https://sefaria.org). This platform, currently in development, aims to leverage cutting-edge technology to enrich traditional Talmud study, making it more accessible and interactive. On this stage we developed Editor App for simple manual linking and now we are working on linking Talmud PDFs to Sefaria texts.
