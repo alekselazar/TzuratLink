@@ -203,3 +203,11 @@ def save_translations(translations):
         return sentance.pk
     except TranslatedSentance.DoesNotExist as e:
         return None
+    
+def get_for_sref(sref):
+    try:
+        first_anchor = PageAnchor.objects.filter(sefaria_ref=sref)
+        page = first_anchor.page
+        return get_page_data(page)
+    except PageAnchor.DoesNotExist as e:
+        return None
