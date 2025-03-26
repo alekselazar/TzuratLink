@@ -135,7 +135,7 @@ def save_sent(page_id, sefaraia_ref, text, boxes=[]):
     
 def get_untranslated_sentance():
     try:
-        untaranslated = TranslatedSentance.objects.filter(is_tanslated=False).first()
+        untaranslated = TranslatedSentance.objects.filter(is_translated=False).first()
         return untaranslated
     except TranslatedSentance.DoesNotExist as e:
         return None
