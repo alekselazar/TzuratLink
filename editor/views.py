@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
@@ -35,7 +35,7 @@ def index(request):
                       context={
                           'component': json.dumps('EditorTaskManager'),
                           'props': {
-                              'inincompleted': json.dumps(incompleted),
+                              'incompleted': json.dumps(incompleted),
                               'unreviewed': json.dumps(unreviewed),
                               'untranslated': json.dumps(untranslated)
                               }
