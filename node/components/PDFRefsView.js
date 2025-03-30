@@ -89,7 +89,7 @@ const PDFRefsView = React.memo(() => {
     const handleSelectRef = (event, index) => {
         event.preventDefault();
         setSefariaRef(sefariaRefChoices[index]);
-        fetch(`https://www.sefaria.org/api/v3/texts/${sefariaRefChoices[index]}`).then((res) => {
+        fetch(`https://www.sefaria.org/api/v3/texts/${sefariaRefChoices[index]}?return_format=text_only`).then((res) => {
             if (!res.ok) throw new Error('Failed to fetch sefaria resource.');
             return res.json();
         }).then((data) => {
