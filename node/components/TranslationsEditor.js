@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 
 const TranslationsEditor = ({ sentanceId, sentance, en, he, ru, ua }) => {
         
@@ -17,7 +17,7 @@ const TranslationsEditor = ({ sentanceId, sentance, en, he, ru, ua }) => {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        fetch('/translates/', {
+        fetch('/editor/translates/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -35,7 +35,7 @@ const TranslationsEditor = ({ sentanceId, sentance, en, he, ru, ua }) => {
             return res.json();
         }).then((data) => {
             if (data.error) throw new Error(data.error);
-            window.location.reload(true);
+            document.location.href = document.location.href;
         }).catch((err) => {
             console.error(err);
             return;
@@ -45,23 +45,27 @@ const TranslationsEditor = ({ sentanceId, sentance, en, he, ru, ua }) => {
     return (
         <>
             <p>{sentance}</p>
+            <br/>
             <label>
                 English:
-                <textarea value={enTranslation} onChange={(e) => setEnTranslation(e.target.value)} />
             </label>
+            <textarea value={enTranslation} onChange={(e) => setEnTranslation(e.target.value)} />
+            <br/>
             <label>
                 Hebrew:
-                <textarea value={heTranslation} onChange={(e) => setHeTranslation(e.target.value)} />
             </label>
+            <textarea value={heTranslation} onChange={(e) => setHeTranslation(e.target.value)} />
+            <br/>
             <label>
                 Russian:
-                <textarea value={ruTranslation} onChange={(e) => setRuTranslation(e.target.value)} />
             </label>
+            <textarea value={ruTranslation} onChange={(e) => setRuTranslation(e.target.value)} />
+            <br/>
             <label>
                 Ukrainian:
-                <textarea value={uaTranslation} onChange={(e) => setUaTranslation(e.target.value)} />
             </label>
-
+            <textarea value={uaTranslation} onChange={(e) => setUaTranslation(e.target.value)} />
+            <br/>
             <button role="button" onClick={handleSubmit}>Submit</button>
         </>
     );

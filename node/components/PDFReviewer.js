@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
 
-const PDFReviewer = ({ pageId, file, boxes, anchors, parentCallback }) => {
+const PDFReviewer = ({ pageId, file, boxes }) => {
     
     const [currentRef, setCurrentRef] = useState('');
     const [relatedText, setRelatedText] = useState('');
@@ -41,7 +41,7 @@ const PDFReviewer = ({ pageId, file, boxes, anchors, parentCallback }) => {
             setRelatedText(data.versions[0].text);
         }).catch((err) => {
             console.error(err);
-            sefariaRef('');
+            setCurrentRef('');
             setRelatedText('');
             setWarning(err.message);
         });
@@ -62,7 +62,7 @@ const PDFReviewer = ({ pageId, file, boxes, anchors, parentCallback }) => {
             return res.json();
         }).then((data) => {
             if (data.error) throw new Error(data.error);
-            parentCallback();
+            document.location.href = document.location.href;
         }).catch((err) => {
             console.error(err);
             setWarning(err.message);
@@ -76,7 +76,7 @@ const PDFReviewer = ({ pageId, file, boxes, anchors, parentCallback }) => {
                 {
                     boxes.map((box, i) => (
                         <div 
-                            className={boxes.sefariaRef === currentRef ? 'highlighted-box' : ''}
+                            className='edited-box'
                             style={{
                                 position: 'absolute',
                                 top: box.top,
@@ -84,7 +84,7 @@ const PDFReviewer = ({ pageId, file, boxes, anchors, parentCallback }) => {
                                 width: box.width,
                                 height: box.height
                             }}
-                            onClick={() => handleClick(box.sefariaRef)}
+                            onClick={() => handleClick(box.sefaria_ref)}
                         />
                     ))
                 }
@@ -106,9 +106,9 @@ const PDFReviewer = ({ pageId, file, boxes, anchors, parentCallback }) => {
             <div style={{ width: '35%', padding: '20px' }}>
                 <div className='current-ref'>
                     {warning && <p style={{color: 'red'}}>{warning}</p>}
-                    {sefariaRef ? (
+                    {currentRef ? (
                         <>
-                            <h3>{sefariaRef}</h3>
+                            <h3>{currentRef}</h3>
                             <p>{relatedText}</p>
                         </>
                     ) : (

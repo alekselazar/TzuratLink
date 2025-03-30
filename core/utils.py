@@ -113,21 +113,21 @@ def review(page_id):
     except Page.DoesNotExist as e:
         return None
     
-def save_sent(page_id, sefaraia_ref, text, boxes=[]):
+def save_sent(page_id, sefaria_ref, text, boxes=[]):
     try:
         page = Page.objects.get(pk=page_id)
-        if boxes:
-            for box in boxes:
-                b_container = BoundingContainer(
-                    sefaraia_ref=sefaraia_ref,
-                    top=box.top,
-                    left=box.left,
-                    width=box.width,
-                    height=box.height,
-                    page_ref=page
-                )
-                b_container.save()
-        sentance = TranslatedSentance(sentance=text, sefaraia_ref=sefaraia_ref)
+        for box in boxes:
+            b_container = BoundingContainer(
+                sefaria_ref=sefaria_ref,
+                top=box['top'],
+                left=box['left'],
+                width=box['width'],
+                height=box['height'],
+                page_ref=page
+            )
+            print(b_container)
+            b_container.save()
+        sentance = TranslatedSentance(sentance=text, sefaria_ref=sefaria_ref)
         sentance.save()
         return sentance.pk
     except Page.DoesNotExist as e:
@@ -142,18 +142,17 @@ def get_untranslated_sentance():
     
 def get_openai_translations(sentance_id):
     
-    load_dotenv('../.env')
+    load_dotenv('.env')
     client = OpenAI()
 
     try:
         sentance = TranslatedSentance.objects.get(pk=sentance_id)
-
         translations = {
             'sentanceId': sentance.pk,
             'sentance': sentance.sentance
         }
 
-        languges = {
+        languages = {
             'en': 'English',
             'he': 'Hebrew',
             'ru': 'Russian',
@@ -163,19 +162,19 @@ def get_openai_translations(sentance_id):
         def translate(text, language):
             try:
                 prompt = f'Translate the following talmudic text into {language}:\n\n{text}\n\n'
-                res = client.chat.completions.create(
+                res = client.responses.create(
                     model="gpt-4o-mini",
-                    messages=[
-                        {'role': 'system',  'content': 'You are Jewish Sages\' language translator, your output is only the translated text'},
+                    input=[
+                        {'role': 'system',  'content': 'You are Jewish Sages\' language translator, your output is only the translated text, if hebrew translation required, response should be in simple modern hebrew, understood for everyone'},
                         {'role': 'user', 'content': prompt}
                     ] 
                 )
-                translation = res.choices[0].message
+                translation = res.output_text
                 return translation
-            except:
+            except BaseException as e:
+                print(e)
                 return None
-            
-        for key, value in languges:
+        for key, value in languages.items():
             translation = translate(sentance.sentance, value)
             if not translation:
                 return None
@@ -206,7 +205,7 @@ def save_translations(translations):
     
 def get_for_sref(sref):
     try:
-        first_anchor = PageAnchor.objects.filter(sefaria_ref=sref)
+        first_anchor = PageAnchor.objects.filter(sefaria_ref=sref).first()
         page = first_anchor.page
         return get_page_data(page)
     except PageAnchor.DoesNotExist as e:

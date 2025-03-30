@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { usePDFEditorState } from './PDFEditorContext';
 
 const PDFRefsView = React.memo(() => {
@@ -152,7 +152,7 @@ const PDFRefsView = React.memo(() => {
             return res.json();
         }).then((data) => {
             if (data.error) throw new Error(data.error);
-            window.location.reload(true);
+            document.location.href = document.location.href;
         }).catch((err) => {
             setWarning(err.message);
             console.error(err);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const EditorInput = ({ parentCallback }) => {
+const EditorInput = () => {
     const [fileUrl, setFileUrl] = useState('');
     const [anchors, setAnchors] = useState([]);
     const [currentAnchor, setCurrentAnchor] = useState('');
@@ -40,7 +40,7 @@ const EditorInput = ({ parentCallback }) => {
             return res.json();
         }).then((data) => {
             if (data.error) throw new Error(data.error);
-            parentCallback(data);
+            document.location.href = document.location.href;
         }).catch((err) => {
             console.error(err);
             setWarning(err.message);
@@ -51,7 +51,9 @@ const EditorInput = ({ parentCallback }) => {
         <form>
             {warning && <p style={{color: 'red'}}>{warning}</p>}
             <h3>Please input data for new page</h3>
+            <label>File URL:</label>
             <input value={fileUrl} onChange={e => setFileUrl(e.target.value)} />
+            <label>Sefaria API Anchors:</label>
             {anchors ? (
                 <ul>
                     {

@@ -1,3 +1,8 @@
+textarea {
+    min-width: 50%;
+    min-height: 20%;
+}
+
 .boxes-layer, .edited-layer {
     position: absolute;
     top: 0px;

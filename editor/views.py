@@ -29,19 +29,31 @@ def index(request):
     incompleted = get_incompleted_page()
     untranslated = get_untranslated_sentance()
 
-    if incompleted or untranslated:
+    if incompleted:
         return render(request,
                       'editor.html',
                       context={
-                          'component': json.dumps('EditorTaskManager'),
-                          'props': {
-                              'incompleted': json.dumps(incompleted),
-                              'unreviewed': json.dumps(unreviewed),
-                              'untranslated': json.dumps(untranslated)
-                              }
-                            })
+                          'component': json.dumps('PDFEditor'),
+                          'props': json.dumps(incompleted)
+                          })
+    if unreviewed:
+        return render(request,
+                      'editor.html',
+                      context={
+                          'component': json.dumps('PDFReviewer'),
+                          'props': json.dumps(unreviewed)
+                          })
+    if untranslated:
+        translations = get_openai_translations(untranslated.pk)
+        return render(request,
+                      'editor.html',
+                      context={
+                          'component': json.dumps('TranslationsEditor'),
+                          'props': json.dumps(translations)
+                          })
+        
     
-    return render(request, 'editor.html', context={'component': json.dumps('EditorInput')})
+    return render(request, 'editor.html', context={'component': json.dumps('EditorInput'), 'props': '{}'})
 
 @login_required
 def save_sentance(request):
@@ -101,14 +113,10 @@ def translates(request):
     if request.method == 'POST':
         try:
             body = json.loads(request.body)
+            print(body)
             success_pk = save_translations(body)
             if success_pk:
                 return JsonResponse({'success': 'Translations saved'})
         except:
             return JsonResponse({'error': 'Bad request'}, status=400)
-
-    sentance_id = get_untranslated_sentance().pk    
-    translations = get_openai_translations(sentance_id)
-    if translations:
-        return JsonResponse(translations, staus=200)
     return JsonResponse({'error': 'Bad response'}, status=400)
