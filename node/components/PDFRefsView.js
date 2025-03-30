@@ -21,7 +21,7 @@ const PDFRefsView = React.memo(() => {
 
     useEffect(() => {
         const fetchRefsAndLinks = async () => {
-            const CATEGORIES = ['Commentary', 'Halachah', 'Tanakh', 'Talmud', 'Mishnah'];
+            const CATEGORIES = ['Commentary', 'Halakhah', 'Tanakh', 'Talmud', 'Mishnah'];
 
             try {
                 const refs = await Promise.all(
@@ -102,6 +102,11 @@ const PDFRefsView = React.memo(() => {
         });
     };
 
+    const handleDeleteRefFromList = (event, index) => {
+        event.preventDefault();
+        setSefariaRefChoices(prev => prev.filter((ref, i) => i !== index));
+    };
+
     const submitSentance = (event) => {
         event.preventDefault();
 
@@ -177,7 +182,7 @@ const PDFRefsView = React.memo(() => {
                         {
                             sefariaRefChoices.map((choice, index) => (
                                 <li key={index} className='ref-li'>
-                                    <button onClick={(e) => handleSelectRef(e, index)}>
+                                    <button onClick={(e) => handleSelectRef(e, index)} onContextMenu={(e) => handleDeleteRefFromList(e, index)}>
                                         {choice}
                                     </button>
                                 </li>

@@ -125,7 +125,6 @@ def save_sent(page_id, sefaria_ref, text, boxes=[]):
                 height=box['height'],
                 page_ref=page
             )
-            print(b_container)
             b_container.save()
         sentance = TranslatedSentance(sentance=text, sefaria_ref=sefaria_ref)
         sentance.save()

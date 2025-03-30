@@ -19,7 +19,7 @@ class PageAnchor(models.Model):
     sefaria_ref = models.CharField(max_length=100)
 
 class TranslatedSentance(models.Model):
-    sentance = models.CharField(max_length=510)
+    sentance = models.TextField()
     sefaria_ref = models.CharField(max_length=100)
     is_translated = models.BooleanField(default=False)
 
