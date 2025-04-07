@@ -158,13 +158,14 @@ def get_openai_translations(sentance_id):
             'ua': 'Ukrainian'
         }
 
-        def translate(text, language):
+        def translate(text, language, ref):
             try:
-                prompt = f'Translate the following talmudic text into {language}:\n\n{text}\n\n'
+                prompt = f'Translate the following talmudic text into {language}, it\'s Sefaria ref is {ref}:\n\n{text}\n\nIf sefaria has translation of it, examine it, and translate according it'
                 res = client.responses.create(
                     model="gpt-4o-mini",
                     input=[
-                        {'role': 'system',  'content': 'You are Jewish Sages\' language translator, your output is only the translated text, if hebrew translation required, response should be in simple modern hebrew, understood for everyone'},
+                        {'role': 'system',
+                         'content': 'You are a scholarly multilingual translator specialized in classical Jewish Hebrew texts (Biblical, Talmudic, Rabbinic, Rishonim, Acharonim). When given a passage and one or more target languages, your job is to translate it accurately into each language while preserving nuance, halachic concepts, and traditional tone. Use proper grammar and vocabulary suitable for each language’s audience. Wait for user input that includes the languages and text to translate. Only return the translation.'},
                         {'role': 'user', 'content': prompt}
                     ] 
                 )
@@ -174,7 +175,7 @@ def get_openai_translations(sentance_id):
                 print(e)
                 return None
         for key, value in languages.items():
-            translation = translate(sentance.sentance, value)
+            translation = translate(sentance.sentance, value, sentance.sefaria_ref)
             if not translation:
                 return None
             translations[key] = translation

@@ -30,6 +30,6 @@ class Translation(models.Model):
         ('ru', 'Russian'),
         ('ua', 'Ukrainian')
     ]
-    translation = models.CharField(max_length=510)
+    translation = models.TextField()
     sentance = models.ForeignKey(TranslatedSentance, on_delete=models.CASCADE)
     language = models.CharField(max_length=2, choices=CHOICES)
