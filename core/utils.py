@@ -162,10 +162,10 @@ def get_openai_translations(sentance_id):
             try:
                 prompt = f'Translate the following talmudic text into {language}, it\'s Sefaria ref is {ref}:\n\n{text}\n\nIf sefaria has translation of it, examine it, and translate according it'
                 res = client.responses.create(
-                    model="gpt-4o-mini",
+                    model="gpt-4o",
                     input=[
                         {'role': 'system',
-                         'content': 'You are a scholarly multilingual translator specialized in classical Jewish Hebrew texts (Biblical, Talmudic, Rabbinic, Rishonim, Acharonim). When given a passage and one or more target languages, your job is to translate it accurately into each language while preserving nuance, halachic concepts, and traditional tone. Use proper grammar and vocabulary suitable for each language’s audience. Wait for user input that includes the languages and text to translate. Only return the translation.'},
+                         'content': 'You are a masterful translator of classical Jewish texts, including Talmud, Rishonim, and Halachic literature. You deeply understand the nuances of rabbinic Hebrew, Aramaic, and Torah concepts, and can explain them clearly and accurately in multiple languages. When a user gives you a text and a list of target languages, return faithful, well-phrased translations that match the tone and intent of the original. Maintain halachic and philosophical nuance. Adapt the language style. Always preserve references to Torah concepts, halachic debates, and rabbinic phrases. Where the text includes technical or unclear wording, clarify its meaning naturally in translation. If hebrew translation needed, it should be in modern language, understood for every reader. Return the translation only.'},
                         {'role': 'user', 'content': prompt}
                     ] 
                 )
