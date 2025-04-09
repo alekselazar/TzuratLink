@@ -1,0 +1,8 @@
+{% extends "reader.html" %}
+
+{% block title %} | Daf Yomi {% endblock %}
+
+{% block content %}
+{% if amud == 'a' %}<a id="navigate" href="/dafyomi/b">Next Page</a>{% endif %}
+{% if amud == 'b' %}<a id="navigate" href="/dafyomi/a">Previous Page</a>{% endif %}
+{% endblock %}

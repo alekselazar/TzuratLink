@@ -1,0 +1,40 @@
+header {
+    height: 30px;
+}
+
+#logo {
+    width: 27px;
+    height: 27px;
+    display: inline-block;
+}
+
+#title {
+    font-family: sans-serif;
+    font-size: 27px;
+}
+
+#navigate:link, #navigate:active, #naigate:visited {
+    text-decoration: none;
+    padding: 14px 25px;
+    background-color: #fff;
+    color: #18345d;
+}
+
+#navigate:hover {
+    text-decoration: none;
+    padding: 14px 25px;
+    color: #fff;
+    background-color: #18345d;
+}
+
+.highlighted-box {
+    background-color: blue;
+    border: 1px solid blue;
+    box-sizing: border-box;
+    opacity: 0.3;
+    position: absolute;
+}
+
+.boxes-layer {
+    z-index: 2;
+}

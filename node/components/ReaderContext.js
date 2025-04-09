@@ -7,7 +7,7 @@ export const useReaderState = (selector) => {
     return selector(context);
 };
 
-export const ReaderStateProvider = ({ pageId, file, boxes, children }) => {
+export const ReaderStateProvider = ({ pageId, file, boxes, anchors, children }) => {
 
     const idRef = useRef(pageId);
 
