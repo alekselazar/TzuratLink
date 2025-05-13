@@ -4,7 +4,6 @@ import EditorInput from './EditorInput';
 import PDFReviewer from './PDFReviewer';
 import TranslationsEditor from './TranslationsEditor';
 import '@react-pdf-viewer/core/lib/styles/index.css';
-import '../../static/css/editor.css';
 
 const EditorApp = ({ component, props }) => {
 

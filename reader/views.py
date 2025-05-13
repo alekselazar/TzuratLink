@@ -5,12 +5,11 @@ import urllib.request
 from core.utils import get_for_sref
 
 def index(request):
-    redirect('daf_yomi')
+    return redirect('daf yomi')
 
 def daf_yomi(request, amud='a'):
     if request.method != 'GET':
         return JsonResponse({'error': "You are not permitted"}, status=403)
-    
     
     req = urllib.request.Request('https://www.sefaria.org/api/calendars')
     with urllib.request.urlopen(req) as response:
@@ -30,9 +29,13 @@ def daf_yomi(request, amud='a'):
     
     page_data = get_for_sref(ref)
 
+    if page_data is None:
+        return JsonResponse({'error': "Page not found"}, status=404)
+
     return render(request,
                 'dafyomi.html',
                 context={
+                    'app': json.dumps('reader'),
                     'amud': amud,
                     'component': json.dumps('PDFReader'),
                     'props': json.dumps(page_data)

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html>
+{% load static %}
 <head>
     <meta charset="UTF-8" />
     <title>TzuratLink {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/reader.css' %}"/>
 </head>
 <body>
-    {% load static %}
     <script>
         const djangoApp = JSON.parse('{{ app|escapejs }}');
         const djangoComponent = JSON.parse('{{ component|escapejs }}');
@@ -15,6 +16,10 @@
         <img id="logo" src="{% static "img/logo.png" %}" alt="Logo">
         <h1 id="title">TzuratLink</h1>
     </header>
+    <nav>
+        {% block navigate %}
+        {% endblock %}
+    </nav>
     <div id="app">
         {% block content %}
         {% endblock  %}

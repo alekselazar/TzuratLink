@@ -5,7 +5,7 @@ import ReaderApp from './components/ReaderApp';
 
 const root = ReactDOM.createRoot(document.getElementById('app'));
 
-const App = djangoApp === 'Editor' ? EditorApp : ReaderApp
+const App = djangoApp === 'EditorApp' ? EditorApp : ReaderApp
 
 const app = React.createElement(App, { component: djangoComponent, props: djangoProps });
 

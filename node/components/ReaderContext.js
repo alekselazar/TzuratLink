@@ -1,4 +1,4 @@
-import React, { useContext, createContext, useState, useMemo } from "react";
+import React, { useContext, createContext, useState, useRef, useMemo } from "react";
 
 const ReaderContext = createContext(null);
 
@@ -10,6 +10,7 @@ export const useReaderState = (selector) => {
 export const ReaderStateProvider = ({ pageId, file, boxes, anchors, children }) => {
 
     const idRef = useRef(pageId);
+    const lang = useRef(navigator.language);
 
     const fileBlobUrl = useMemo(() => {
         const bytes = atob(file);
@@ -28,6 +29,7 @@ export const ReaderStateProvider = ({ pageId, file, boxes, anchors, children }) 
 
     const [sefariaRef, setSefariaRef] = useState('');
     const [highlightedBoxes, setHighlightedBoxes] = useState([]);
+    const [hoverBoxes, setHoverBoxes] = useState([]);
     const [existingBoxes, setExistingBoxes] = useState(boxes);
     const [text, setText] = useState('');
     const [related, setRelated] = useState({});
@@ -36,25 +38,27 @@ export const ReaderStateProvider = ({ pageId, file, boxes, anchors, children }) 
         {
             sefariaRef,
             highlightedBoxes,
+            hoverBoxes,
             existingBoxes,
             text,
             related,
             warning,
             setSefariaRef,
             setHighlightedBoxes,
+            setHoverBoxes,
             setExistingBoxes,
             setText,
             setRelated,
             setWarning,
             idRef,
+            lang,
             fileBlobUrl
         }
     ), [
         sefariaRef,
         highlightedBoxes,
-        relatedText,
-        warning,
-        sefariaRef
+        text,
+        warning
     ]);
 
     return (

@@ -1,16 +1,36 @@
+:root {
+    --commentary: #4B71B7;
+    --tanakh: #004E5F;
+    --mishnah: #5A99B7;
+    --talmud: #CCB479;
+    --midrash: #5D956F;
+    --halakhah: #802F3E;
+    --kabbalah: #594176;
+    --liturgy: #AB4E66;
+    --philosophy: #7F85A9;
+    --taanitic: #00827F;
+    --chasidut: #97B386;
+    --mussar: #7C416F;
+    --responsa: #CB6158;
+}
+
 header {
-    height: 30px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
 }
 
 #logo {
-    width: 27px;
-    height: 27px;
+    width: 75px;
+    height: 75px;
     display: inline-block;
 }
 
 #title {
-    font-family: sans-serif;
-    font-size: 27px;
+    font-family: monospace;
+    font-size: 30px;
+    display: inline;
+    color: #18345d;
 }
 
 #navigate:link, #navigate:active, #naigate:visited {
@@ -27,14 +47,82 @@ header {
     background-color: #18345d;
 }
 
-.highlighted-box {
-    background-color: blue;
-    border: 1px solid blue;
+.pdf-reader {
+    display: flex;
+    width: 100%;
+}
+
+.highlighted-box, .hover-box {
+    background-color: var(--talmud);
+    border: 1px solid var(--talmud);
     box-sizing: border-box;
-    opacity: 0.3;
+    opacity: 0.2;
     position: absolute;
+}
+
+.box {
+    position: absolute;
+    transition: opacity .1s;
 }
 
 .boxes-layer {
     z-index: 2;
+}
+
+.accordion {
+    font-size: 25px;
+    text-align: justify;
+}
+
+.accordion-title {
+    background-color: #eee;
+    cursor: pointer;
+    padding: 18px;
+    width: 90%;
+    border: none;
+    outline: none;
+    transition: 0.4s;
+}
+
+.accordion-title:hover {
+    background-color: #ccc;
+}
+
+.accordion-panel {
+    padding: 0 18px;
+    overflow: hidden;
+    transition: 0.4s;
+}
+
+.related-text {
+    display: block;
+    font-family: monospace;
+    font-size: 25px;
+    text-align: justify;
+    margin-bottom: 18px;
+}
+
+.category, .sefara-link {
+    margin-bottom: 18px;
+}
+
+.category-name {
+    margin-bottom: 18px;
+    padding: 5px;
+}
+
+.sefaria-link {
+    transition: 0.3s;
+}
+
+.sefara-link:link, .sefara-link:active, .sefara-link:visited {
+    text-decoration: none;
+    background-color: #fff;
+    color: #18345d;
+}
+
+.sefara-link:hover {
+    text-decoration: none;
+    color: #fff;
+    background-color: #18345d;
 }

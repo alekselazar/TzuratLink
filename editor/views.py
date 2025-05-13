@@ -33,27 +33,35 @@ def index(request):
         return render(request,
                       'editor.html',
                       context={
-                          'component': json.dumps('PDFEditor'),
+                          'app': 'EditorApp',
+                          'component': 'PDFEditor',
                           'props': json.dumps(incompleted)
                           })
     if unreviewed:
         return render(request,
                       'editor.html',
                       context={
-                          'component': json.dumps('PDFReviewer'),
+                          'app': 'EditorApp',
+                          'component': 'PDFReviewer',
                           'props': json.dumps(unreviewed)
                           })
     if untranslated:
-        translations = get_openai_translations(untranslated.pk)
+        #translations = get_openai_translations(untranslated.pk)
         return render(request,
                       'editor.html',
                       context={
-                          'component': json.dumps('TranslationsEditor'),
-                          'props': json.dumps(translations)
+                          'app': 'EditorApp',
+                          'component': 'TranslationsEditor',
+                          'props': json.dumps({
+                              'sentanceId': untranslated.pk,
+                              'sentance': untranslated.sentance
+                              })
                           })
         
     
-    return render(request, 'editor.html', context={'component': json.dumps('EditorInput'), 'props': '{}'})
+    return render(request, 'editor.html', context={'app': 'EditorApp',
+                                                   'component': 'EditorInput',
+                                                   'props': '{}'})
 
 @login_required
 def save_sentance(request):
@@ -67,7 +75,8 @@ def save_sentance(request):
         sefaria_ref = body['sefaria_ref']
         related_text = body['related_text']
         boxes = body['boxes']
-        saved = save_sent(page_id, sefaria_ref, related_text, boxes)
+        to_translate = body['to_translate']
+        saved = save_sent(page_id, sefaria_ref, related_text, boxes, to_translate)
         if saved:
             return JsonResponse({'success': 'Sentance saved'}, status=200)
     except:
@@ -113,7 +122,6 @@ def translates(request):
     if request.method == 'POST':
         try:
             body = json.loads(request.body)
-            print(body)
             success_pk = save_translations(body)
             if success_pk:
                 return JsonResponse({'success': 'Translations saved'})

@@ -113,7 +113,7 @@ def review(page_id):
     except Page.DoesNotExist as e:
         return None
     
-def save_sent(page_id, sefaria_ref, text, boxes=[]):
+def save_sent(page_id, sefaria_ref, text, boxes, to_translate):
     try:
         page = Page.objects.get(pk=page_id)
         for box in boxes:
@@ -126,9 +126,12 @@ def save_sent(page_id, sefaria_ref, text, boxes=[]):
                 page_ref=page
             )
             b_container.save()
-        sentance = TranslatedSentance(sentance=text, sefaria_ref=sefaria_ref)
-        sentance.save()
-        return sentance.pk
+        if to_translate:
+            sentance = TranslatedSentance(sentance=text, sefaria_ref=sefaria_ref)
+            sentance.save()
+            return sentance.pk
+        else:
+            return page.pk
     except Page.DoesNotExist as e:
         return None
     
@@ -160,19 +163,18 @@ def get_openai_translations(sentance_id):
 
         def translate(text, language, ref):
             try:
-                prompt = f'Translate the following talmudic text into {language}, it\'s Sefaria ref is {ref}:\n\n{text}\n\nIf sefaria has translation of it, examine it, and translate according it'
+                prompt = f'Translate the following Talmudic text into {language}. Ensure that your translation is accurate, clear, and culturally sensitive, reflecting the legal or narrative style of the original. If the passage contains halachic rulings, preserve their structure and logic. If it contains a question and answer format (shakla v\'tarya), reflect it in the translation.\nHere is text:\n{text}'
                 res = client.responses.create(
-                    model="gpt-4o",
+                    model="gpt-4o-mini",
                     input=[
                         {'role': 'system',
-                         'content': 'You are a masterful translator of classical Jewish texts, including Talmud, Rishonim, and Halachic literature. You deeply understand the nuances of rabbinic Hebrew, Aramaic, and Torah concepts, and can explain them clearly and accurately in multiple languages. When a user gives you a text and a list of target languages, return faithful, well-phrased translations that match the tone and intent of the original. Maintain halachic and philosophical nuance. Adapt the language style. Always preserve references to Torah concepts, halachic debates, and rabbinic phrases. Where the text includes technical or unclear wording, clarify its meaning naturally in translation. If hebrew translation needed, it should be in modern language, understood for every reader. Return the translation only.'},
+                         'content': 'You are a scholarly translator with deep expertise in Talmudic and Rabbinic Hebrew, Aramaic, and Jewish law. You understand the nuances of halachic, aggadic, and sugyah-based reasoning. You translate Talmudic texts into English, Hebrew, Russian, or Ukrainian with full accuracy, sensitivity to cultural and legal context, and clear explanatory language when necessary. Do not just translate literally — understand and explain. When the user requests multiple languages, return translations in all requested languages in clearly labeled sections. Return the translation only.'},
                         {'role': 'user', 'content': prompt}
                     ] 
                 )
                 translation = res.output_text
                 return translation
             except BaseException as e:
-                print(e)
                 return None
         for key, value in languages.items():
             translation = translate(sentance.sentance, value, sentance.sefaria_ref)
@@ -208,5 +210,5 @@ def get_for_sref(sref):
         first_anchor = PageAnchor.objects.filter(sefaria_ref=sref).first()
         page = first_anchor.page
         return get_page_data(page)
-    except PageAnchor.DoesNotExist as e:
+    except (PageAnchor.DoesNotExist, AttributeError) as e:
         return None

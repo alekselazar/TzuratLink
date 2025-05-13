@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { usePDFEditorState } from './PDFEditorContext';
 
 const PDFRefsView = React.memo(() => {
@@ -18,6 +18,8 @@ const PDFRefsView = React.memo(() => {
         anchorsRef,
         idRef
     } = usePDFEditorState((ctx) => ctx);
+
+    const [toTranslate, setToTranslate] = useState(false);
 
     useEffect(() => {
         const fetchRefsAndLinks = async () => {
@@ -120,7 +122,8 @@ const PDFRefsView = React.memo(() => {
                 page_id: idRef.current,
                 sefaria_ref: sefariaRef,
                 related_text: relatedText,
-                boxes: highlightedBoxes
+                boxes: highlightedBoxes,
+                to_translate: toTranslate
             })
         }).then((response) => {
             if (!response.ok) throw new Error('Failed to upload');
@@ -129,6 +132,7 @@ const PDFRefsView = React.memo(() => {
             setRelatedText('');
             setSefariaRefChoices(prev => prev.filter(ref => ref !== sefariaRef));
             setSefariaRef('');
+            setToTranslate(false);
         }).catch((err) => {
             setWarning(err.message);
             console.error(err);
@@ -164,6 +168,10 @@ const PDFRefsView = React.memo(() => {
         });
     };
 
+    const handleCheckBox = (event) => {
+        setToTranslate(event.target.checked);
+    }
+
     return (
         <div className='refs-view'>
             {warning && <p style={{color: 'red'}}>{warning}</p>}
@@ -171,6 +179,11 @@ const PDFRefsView = React.memo(() => {
                 <>
                     <h3>{sefariaRef}</h3>
                     <p>{relatedText}</p>
+                    <input
+                        type='checkbox'
+                        checked={toTranslate}
+                        onChange={handleCheckBox}
+                    ></input>
                     <button onClick={submitSentance}>Submit</button>
                     <button onClick={cancelSentance}>Cancel</button>
                 </>

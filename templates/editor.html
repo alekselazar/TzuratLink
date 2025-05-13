@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html>
+{% load static %}
 <head>
     <meta charset="UTF-8" />
     <title>Editor</title>
+    <link rel="stylesheet" href="{% static 'css/editor.css' %}"/>
 </head>
 <body>
-    {% load static %}
     <script>
-        const djangoApp = JSON.parse('{{ app|escapejs }}');
-        const djangoComponent = JSON.parse('{{ component|escapejs }}');
+        const djangoApp = '{{ app|escapejs }}';
+        const djangoComponent = '{{ component|escapejs }}';
         const djangoProps = JSON.parse('{{ props|escapejs }}');
     </script>
     <div id="app">

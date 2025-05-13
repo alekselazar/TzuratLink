@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
-const TranslationsEditor = ({ sentanceId, sentance, en, he, ru, ua }) => {
+const TranslationsEditor = ({ sentanceId, sentance }) => {
         
-    const [enTranslation, setEnTranslation] = useState(en);
-    const [heTranslation, setHeTranslation] = useState(he);
-    const [ruTranslation, setRuTranslation] = useState(ru);
-    const [uaTranslation, setUaTranslation] = useState(ua);
+    const [enTranslation, setEnTranslation] = useState('');
+    const [heTranslation, setHeTranslation] = useState('');
+    const [ruTranslation, setRuTranslation] = useState('');
+    const [uaTranslation, setUaTranslation] = useState('');
 
     const getCSRFToken = () => {
         const csrfCookie = document.cookie
