@@ -2,6 +2,7 @@ node_modules/
 webpack/
 __pycache__/
 migrations/
+js/
 
 .env
 *.sqlite3
