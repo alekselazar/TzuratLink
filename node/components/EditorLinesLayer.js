@@ -132,11 +132,6 @@ const EditorLinesLayer = React.memo(() => {
                 splitCoords && (
                     <div
                         className='context-menu-background'
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            zIndex: 5
-                        }}
                         onClick={() => setSplitCoords(null)}
                     >
                         <div
@@ -144,7 +139,6 @@ const EditorLinesLayer = React.memo(() => {
                             style={{
                                 top: splitCoords.y - splitCoords.top,
                                 left: splitCoords.x - splitCoords.left,
-                                zIndex: 6
                             }}
                         >
                             <div onClick={(e) => splitHorizontally(e, splitCoords.index)}>Split horizantally</div>

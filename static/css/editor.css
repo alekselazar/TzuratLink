@@ -3,7 +3,7 @@ textarea {
     min-height: 20%;
 }
 
-.boxes-layer, .edited-layer {
+.boxes-layer, .edited-layer, .lines-layer {
     position: absolute;
     top: 0px;
     left: 0px;
@@ -11,7 +11,7 @@ textarea {
     width: 100%;
 }
 
-.boxes-layer {
+.lines-layer {
     z-index: 2;
 }
 
@@ -28,6 +28,23 @@ textarea {
     border: 1px solid blue;
     box-sizing: border-box;
     opacity: 0.3;
+    position: absolute;
+}
+
+.line {
+    border: 1px solid blue;
+    position: absolute;
+}
+
+.context-menu-background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 3
+}
+
+.context-menu {
+    z-index: 4;
     position: absolute;
 }
 
