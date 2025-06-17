@@ -1,13 +1,13 @@
 import React, { useContext, createContext, useRef, useState, useMemo } from 'react';
 
-const PDFEditorContext = createContext(null);
+const PageEditorContext = createContext(null);
 
-export const usePDFEditorState = (selector) => {
-    const context = useContext(PDFEditorContext);
+export const usePageEditorState = (selector) => {
+    const context = useContext(PageEditorContext);
     return selector(context);
 };
 
-export const PDFStateProvider = ({ pageId, file, boxes, anchors, children }) => {
+export const PageStateProvider = ({ pageId, file, lines, boxes, anchors, children }) => {
 
     const idRef = useRef(pageId);
     const anchorsRef = useRef(anchors)
@@ -22,12 +22,13 @@ export const PDFStateProvider = ({ pageId, file, boxes, anchors, children }) => 
             out[len] = bytes.charCodeAt(len);
         }
 
-        const blob = new Blob([out], { type: 'application/pdf' });
+        const blob = new Blob([out], { type: 'image/png' });
 
         return URL.createObjectURL(blob);
     });
 
     const [sefariaRef, setSefariaRef] = useState('');
+    const [ocrLines, setOcrLines] = useState(lines);
     const [existingBoxes, setExistingBoxes] = useState(boxes);
     const [highlightedBoxes, setHilightedBoxes] = useState([]);
     const [relatedText, setRelatedText] = useState('');
@@ -37,12 +38,14 @@ export const PDFStateProvider = ({ pageId, file, boxes, anchors, children }) => 
     const contextValue = useMemo(() => (
         {
             sefariaRef,
+            ocrLines,
             existingBoxes,
             highlightedBoxes,
             relatedText,
             warning,
             sefariaRefChoices,
             setSefariaRef,
+            setOcrLines,
             setExistingBoxes,
             setHilightedBoxes,
             setRelatedText,
@@ -54,6 +57,7 @@ export const PDFStateProvider = ({ pageId, file, boxes, anchors, children }) => 
         }
     ), [
         sefariaRef,
+        ocrLines,
         existingBoxes,
         highlightedBoxes,
         relatedText,
@@ -63,9 +67,9 @@ export const PDFStateProvider = ({ pageId, file, boxes, anchors, children }) => 
     ]);
 
     return (
-        <PDFEditorContext.Provider value={contextValue}>
+        <PageEditorContext.Provider value={contextValue}>
             {children}
-        </PDFEditorContext.Provider>
+        </PageEditorContext.Provider>
     )
 
 };

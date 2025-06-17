@@ -5,6 +5,7 @@ class Page(models.Model):
     foreign_url = models.CharField(max_length=255)
     completed = models.BooleanField(default=False)
     reviewed = models.BooleanField(default=False)
+    ocr = models.TextField()
 
 class BoundingContainer(models.Model):
     sefaria_ref = models.CharField(max_length=100)

@@ -5,7 +5,7 @@ from django.http import JsonResponse
 
 import json
 
-from core.utils import get_incompleted_page, get_unreviewed_page, create_new_page, complete, review, save_sent, get_untranslated_sentance, save_translations, get_openai_translations
+from core.utils import get_incompleted_page, get_unreviewed_page, create_new_page, complete, review, save_sent, get_untranslated_sentance, save_translations, get_lines
 
 @login_required
 def index(request):
@@ -62,6 +62,15 @@ def index(request):
     return render(request, 'editor.html', context={'app': 'EditorApp',
                                                    'component': 'EditorInput',
                                                    'props': '{}'})
+
+@login_required
+def lines(request, page_id):
+    if not request.user.is_staff:
+        return JsonResponse({'error': "You are not permitted"}, status=403)
+    lines = get_lines(page_id)
+    if lines:
+        return JsonResponse(lines, status=200)
+    return JsonResponse({'error': 'Data for requested page not found'}, status=404)
 
 @login_required
 def save_sentance(request):

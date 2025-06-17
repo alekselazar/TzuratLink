@@ -1,9 +1,9 @@
 import React from 'react';
-import { usePDFEditorState } from './PDFEditorContext';
+import { usePageEditorState } from './PageEditorContext';
 
 const EditedLayer = React.memo(() => {
     
-    const existingBoxes = usePDFEditorState((ctx) => ctx.existingBoxes);
+    const existingBoxes = usePageEditorState((ctx) => ctx.existingBoxes);
 
     return (
         <div className='edited-layer'>

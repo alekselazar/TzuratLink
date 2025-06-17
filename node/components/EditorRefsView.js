@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { usePDFEditorState } from './PDFEditorContext';
+import { usePageEditorState } from './PageEditorContext';
 
-const PDFRefsView = React.memo(() => {
+const EditorRefsView = React.memo(() => {
 
     const {
         sefariaRef,
@@ -17,7 +17,7 @@ const PDFRefsView = React.memo(() => {
         setSefariaRefChoices,
         anchorsRef,
         idRef
-    } = usePDFEditorState((ctx) => ctx);
+    } = usePageEditorState((ctx) => ctx);
 
     const [toTranslate, setToTranslate] = useState(false);
 
@@ -211,4 +211,4 @@ const PDFRefsView = React.memo(() => {
 
 });
 
-export default PDFRefsView;
+export default EditorRefsView;

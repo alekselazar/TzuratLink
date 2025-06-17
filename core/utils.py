@@ -1,8 +1,10 @@
 import base64
+import json
 import urllib.request, urllib.error
-
-from openai import OpenAI
-from dotenv import load_dotenv
+import pytesseract
+import fitz
+from PIL import Image
+from io import BytesIO
 
 from .models import Page, BoundingContainer, TranslatedSentance, Translation, PageAnchor
 
@@ -56,15 +58,24 @@ def create_new_page(url, anchors):
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         })
         with urllib.request.urlopen(req) as res:
-            data = res.read()
-            base64_encoded = base64.b64encode(data).decode('utf-8')
-            page = Page(
-                file=base64_encoded,
-                foreign_url=url,
-                reviewed=False,
-                completed=False
-            )
-            page.save()
+            pdf_bytes = res.read()
+
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        page = doc[0]
+        pix = page.get_pixmap(dpi=300)
+        img = Image.frombytes("L", [pix.width, pix.height], pix.samples)
+        ocr_data = pytesseract.image_to_data(img, lang="heb+rashi",output_type="dict")
+        buffer = BytesIO()
+        img.save(buffer, format="PNG")
+        b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
+        page = Page(
+            file=b64,
+            foreign_url=url,
+            reviewed=False,
+            completed=False,
+            ocr=json.dumps(ocr_data, ensure_ascii=False)
+        )
+        page.save()
         for anchor in anchors:
             pageanchor = PageAnchor(page=page, sefaria_ref=anchor)
             pageanchor.save()
@@ -141,49 +152,51 @@ def get_untranslated_sentance():
         return untaranslated
     except TranslatedSentance.DoesNotExist as e:
         return None
-    
-def get_openai_translations(sentance_id):
-    
-    load_dotenv('.env')
-    client = OpenAI()
 
+def get_lines(page_id):
     try:
-        sentance = TranslatedSentance.objects.get(pk=sentance_id)
-        translations = {
-            'sentanceId': sentance.pk,
-            'sentance': sentance.sentance
-        }
+        page = Page.objects.get(pk=page_id)
+        data = json.loads(page.ocr)
+        if not data or 'level' not in data:
+            return None
 
-        languages = {
-            'en': 'English',
-            'he': 'Hebrew',
-            'ru': 'Russian',
-            'ua': 'Ukrainian'
-        }
+        for i, level in enumerate(data['level']):
+            if level == 1:
+                img_width = data['width'][i]
+                img_height = data['height'][i]
+                break
+        else:
+            return None
+        
+        lines = []
 
-        def translate(text, language, ref):
-            try:
-                prompt = f'Translate the following Talmudic text into {language}. Ensure that your translation is accurate, clear, and culturally sensitive, reflecting the legal or narrative style of the original. If the passage contains halachic rulings, preserve their structure and logic. If it contains a question and answer format (shakla v\'tarya), reflect it in the translation.\nHere is text:\n{text}'
-                res = client.responses.create(
-                    model="gpt-4o-mini",
-                    input=[
-                        {'role': 'system',
-                         'content': 'You are a scholarly translator with deep expertise in Talmudic and Rabbinic Hebrew, Aramaic, and Jewish law. You understand the nuances of halachic, aggadic, and sugyah-based reasoning. You translate Talmudic texts into English, Hebrew, Russian, or Ukrainian with full accuracy, sensitivity to cultural and legal context, and clear explanatory language when necessary. Do not just translate literally — understand and explain. When the user requests multiple languages, return translations in all requested languages in clearly labeled sections. Return the translation only.'},
-                        {'role': 'user', 'content': prompt}
-                    ] 
-                )
-                translation = res.output_text
-                return translation
-            except BaseException as e:
-                return None
-        for key, value in languages.items():
-            translation = translate(sentance.sentance, value, sentance.sefaria_ref)
-            if not translation:
-                return None
-            translations[key] = translation
-        return translations
-    except TranslatedSentance.DoesNotExist as e:
+        for i, level in enumerate(data['level']):
+            if level != 4:
+                continue
+
+            left = data['left'][i]
+            top = data['top'][i]
+            width = data['width'][i]
+            height = data['height'][i]
+
+            left_pct = (left / img_width) * 100
+            top_pct = (top / img_height) * 100
+            width_pct = (width / img_width) * 100
+            height_pct = (height / img_height) * 100
+
+            css = {
+                'left': f"{left_pct:.4f}%",
+                'top': f"{top_pct:.4f}%",
+                'width': f"{width_pct:.4f}%",
+                'height': f"{height_pct:.4f}%"
+            }
+
+            lines.append(css)
+
+        return lines
+    except Page.DoesNotExist as e:
         return None
+
 
 def save_translations(translations):
     try:
