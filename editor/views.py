@@ -34,7 +34,7 @@ def index(request):
                       'editor.html',
                       context={
                           'app': 'EditorApp',
-                          'component': 'PDFEditor',
+                          'component': 'PageEditor',
                           'props': json.dumps(incompleted)
                           })
     if unreviewed:
@@ -42,7 +42,7 @@ def index(request):
                       'editor.html',
                       context={
                           'app': 'EditorApp',
-                          'component': 'PDFReviewer',
+                          'component': 'PageReviewer',
                           'props': json.dumps(unreviewed)
                           })
     if untranslated:
