@@ -63,7 +63,7 @@ def create_new_page(url, anchors):
         doc = fitz.open(stream=pdf_bytes, filetype="pdf")
         page = doc[0]
         pix = page.get_pixmap(dpi=300)
-        img = Image.frombytes("L", [pix.width, pix.height], pix.samples)
+        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
         ocr_data = pytesseract.image_to_data(img, lang="heb+rashi",output_type="dict")
         buffer = BytesIO()
         img.save(buffer, format="PNG")

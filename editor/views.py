@@ -69,7 +69,7 @@ def lines(request, page_id):
         return JsonResponse({'error': "You are not permitted"}, status=403)
     lines = get_lines(page_id)
     if lines:
-        return JsonResponse(lines, status=200)
+        return JsonResponse(lines, status=200, safe=False)
     return JsonResponse({'error': 'Data for requested page not found'}, status=404)
 
 @login_required

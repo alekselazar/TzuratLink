@@ -7,5 +7,6 @@ urlpatterns = [
     path('reviewpage/', views.review_page, name='review page'),
     path('completepage/', views.complete_page, name='complete page'),
     path('savesentance/', views.save_sentance, name='save sentance'),
-    path('translates/', views.translates, name='save translate')
+    path('translates/', views.translates, name='save translate'),
+    path('lines/<int:page_id>', views.lines, name='lines')
 ]

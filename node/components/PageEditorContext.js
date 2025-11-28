@@ -30,7 +30,7 @@ export const PageStateProvider = ({ pageId, file, lines, boxes, anchors, childre
     const [sefariaRef, setSefariaRef] = useState('');
     const [ocrLines, setOcrLines] = useState(lines);
     const [existingBoxes, setExistingBoxes] = useState(boxes);
-    const [highlightedBoxes, setHilightedBoxes] = useState([]);
+    const [highlightedBoxes, setHighlightedBoxes] = useState([]);
     const [relatedText, setRelatedText] = useState('');
     const [warning, setWarning] = useState('');
     const [sefariaRefChoices, setSefariaRefChoices] = useState([]);
@@ -47,7 +47,7 @@ export const PageStateProvider = ({ pageId, file, lines, boxes, anchors, childre
             setSefariaRef,
             setOcrLines,
             setExistingBoxes,
-            setHilightedBoxes,
+            setHighlightedBoxes,
             setRelatedText,
             setWarning,
             setSefariaRefChoices,

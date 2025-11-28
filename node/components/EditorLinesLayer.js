@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { usePageEditorState } from './PageEditorContext';
 
 const EditorLinesLayer = React.memo(() => {
 
     const mainRef = useRef(null);
-    const pageId = usePageEditorState((ctx) => ctx.pageId);
+    const idRef = usePageEditorState((ctx) => ctx.idRef);
+    const sefariaRef = usePageEditorState((ctx) => ctx.sefariaRef);
     const setHighlightedBoxes = usePageEditorState((ctx) => ctx.setHighlightedBoxes);
     const setWarning = usePageEditorState((ctx) => ctx.setWarning);
     const [lines, setLines] = useState([]);
@@ -14,9 +15,9 @@ const EditorLinesLayer = React.memo(() => {
 
         const fetchLines = async () => {
             try {
-                res = await fetch(`/editor/lines/${pageId}`);
+                const res = await fetch(`/editor/lines/${idRef.current}`);
                 if (!res.ok) throw new Error('Failed to fetch lines');
-                data = await res.json();
+                const data = await res.json();
                 if (data.error) throw new Error(data.error);
                 setLines(data);
             } catch (err) {
@@ -33,8 +34,8 @@ const EditorLinesLayer = React.memo(() => {
         event.preventDefault();
         const container = mainRef.current;
 
-        const containerRect = container.getBoundingClienRect();
-        const divRect = event.currentTarget.getBoundingClienRect();
+        const containerRect = container.getBoundingClientRect();
+        const divRect = event.currentTarget.getBoundingClientRect();
         const x = event.clientX;
         const y = event.clientY;
         setSplitCoords({
@@ -54,6 +55,11 @@ const EditorLinesLayer = React.memo(() => {
 
     const handleClick = (event, index) => {
         event.preventDefault();
+        if (!sefariaRef) {
+            setWarning('You shold choose sefaria ref from the list first');
+            return;
+        }
+        setWarning('');
         setHighlightedBoxes(prev => [...prev, lines[index]]);
     };
 
@@ -63,16 +69,16 @@ const EditorLinesLayer = React.memo(() => {
 
         const splits = [
             {
-                top: lines[i].top,
-                height: ((splitCoords.y - splitCoords.divTop) / splitCoords.containerHeight) * 100,
-                left: lines[i].left,
-                width: lines[i].width
+                top: lines[index].top,
+                height: `${((splitCoords.y - splitCoords.divTop) / splitCoords.containerHeight) * 100}%`,
+                left: lines[index].left,
+                width: lines[index].width
             },
             {
-                top: ((splitCoords.y - splitCoords.containerTop) / splitCoords.containerHeight) * 100,
-                height: ((splitCoords.divBottom - splitCoords.y) / splitCoords.containerHeight) * 100,
-                left: lines[i].left,
-                width: lines[i].width
+                top: `${((splitCoords.y - splitCoords.containerTop) / splitCoords.containerHeight) * 100}%`,
+                height: `${((splitCoords.divBottom - splitCoords.y) / splitCoords.containerHeight) * 100}%`,
+                left: lines[index].left,
+                width: lines[index].width
             }
         ]
 
@@ -89,16 +95,16 @@ const EditorLinesLayer = React.memo(() => {
 
         const splits = [
             {
-                top: lines[i].top,
-                height: lines[i].height,
-                left: lines[i].left,
-                width: ((splitCoords.x - splitCoords.divLeft) / splitCoords.containerWidth) * 100
+                top: lines[index].top,
+                height: lines[index].height,
+                left: lines[index].left,
+                width: `${((splitCoords.x - splitCoords.divLeft) / splitCoords.containerWidth) * 100}%`
             },
             {
-                top: lines[i].top,
-                height: lines[i].height,
-                left: ((splitCoords.x - splitCoords.containerLeft) / splitCoords.containerWidth) * 100,
-                width: ((splitCoords.divRight - splitCoords.x) / splitCoords.containerWidth) * 100
+                top: lines[index].top,
+                height: lines[index].height,
+                left: `${((splitCoords.x - splitCoords.containerLeft) / splitCoords.containerWidth) * 100}%`,
+                width: `${((splitCoords.divRight - splitCoords.x) / splitCoords.containerWidth) * 100}%`
             }
         ]
 

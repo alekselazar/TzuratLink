@@ -11,7 +11,7 @@ const EditedPageView = React.memo(() => {
     
     return (
         <div>
-            <img src={fileBlobUrl} style={{ width: '100%' }}></img>
+            <img src={fileBlobUrl.current} style={{ width: '100%' }}></img>
             <EditedLayer/>
             <EditorBoxesLayer/>
             <EditorLinesLayer/>
