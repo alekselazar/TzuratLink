@@ -23,7 +23,11 @@
     <div id="app">
         {% block content %}
         {% endblock  %}
-        <h1>Loading...</h1>
+        {% if ssr_html %}
+            {{ ssr_html|safe }}
+        {% else %}
+            <h1>Loading...</h1>
+        {% endif %}
     </div>
     <script src="{% static 'js/bundle.js' %}"></script>
 </body>

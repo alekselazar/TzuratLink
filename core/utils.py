@@ -5,6 +5,8 @@ import pytesseract
 import fitz
 from PIL import Image
 from io import BytesIO
+import threading
+import time
 
 from .models import Page
 
@@ -96,3 +98,42 @@ def get_for_sref(sefaria_ref):
         }
     except Exception as e:
         return None
+
+def get_for_sref_with_timeout(sefaria_ref, timeout=2.0):
+    """
+    Get page data from MongoDB with a timeout for SSR/CSR decision.
+    If data can be fetched within timeout, returns the data (SSR).
+    If timeout is exceeded, returns {'timeout': True, 'ref': sefaria_ref} (CSR fallback).
+    
+    Args:
+        sefaria_ref: Sefaria reference string (e.g., "Berakhot:2a")
+        timeout: Maximum time in seconds to wait (default: 2.0)
+    
+    Returns:
+        dict with page data if successful, or {'timeout': True, 'ref': sefaria_ref} if timeout
+    """
+    result = {'timeout': False, 'data': None}
+    exception_occurred = [False]
+    
+    def fetch_data():
+        try:
+            data = get_for_sref(sefaria_ref)
+            result['data'] = data
+        except Exception as e:
+            exception_occurred[0] = True
+            result['data'] = None
+    
+    # Start fetching in a thread
+    thread = threading.Thread(target=fetch_data)
+    thread.daemon = True
+    thread.start()
+    thread.join(timeout=timeout)
+    
+    if thread.is_alive():
+        # Timeout occurred
+        return {'timeout': True, 'ref': sefaria_ref}
+    
+    if exception_occurred[0] or result['data'] is None:
+        return None
+    
+    return result['data']

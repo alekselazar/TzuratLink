@@ -10,10 +10,10 @@ export const useReaderState = (selector) => {
 export const ReaderStateProvider = ({ pageId, file, boxes, anchors, children }) => {
 
     const idRef = useRef(pageId);
-    const lang = useRef(navigator.language);
+    const lang = useRef(typeof window !== 'undefined' ? navigator.language : 'en');
 
     const fileBlobUrl = useMemo(() => {
-        if (!file) return null;
+        if (!file || typeof window === 'undefined') return null;
         
         const bytes = atob(file);
 
