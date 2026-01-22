@@ -13,6 +13,8 @@ export const ReaderStateProvider = ({ pageId, file, boxes, anchors, children }) 
     const lang = useRef(navigator.language);
 
     const fileBlobUrl = useMemo(() => {
+        if (!file) return null;
+        
         const bytes = atob(file);
 
         let len = bytes.length;
@@ -25,7 +27,7 @@ export const ReaderStateProvider = ({ pageId, file, boxes, anchors, children }) 
         const blob = new Blob([out], { type: 'application/pdf' });
 
         return URL.createObjectURL(blob);
-    });
+    }, [file]);
 
     const [sefariaRef, setSefariaRef] = useState('');
     const [highlightedBoxes, setHighlightedBoxes] = useState([]);
@@ -57,8 +59,12 @@ export const ReaderStateProvider = ({ pageId, file, boxes, anchors, children }) 
     ), [
         sefariaRef,
         highlightedBoxes,
+        hoverBoxes,
+        existingBoxes,
         text,
-        warning
+        related,
+        warning,
+        fileBlobUrl
     ]);
 
     return (

@@ -7,8 +7,8 @@ const AccordionItem = ({title, links}) => {
     return (
         <div className='accordion-item'>
             <div className="accordion-title" onClick={() => setIsOpen(!isOpen)}>{title + ' (' + links.length + ')'}</div>
-            {links.map((link, _) => (
-                        <div className="accordion-panel" style={{ transition: '0.4s', display: isOpen ? 'block' : 'none' }}>
+            {links.map((link, idx) => (
+                        <div key={idx} className="accordion-panel" style={{ transition: '0.4s', display: isOpen ? 'block' : 'none' }}>
                             <h5>{link.sourceRef}</h5>
                             <p dangerouslySetInnerHTML={{ __html: link.text }}></p>
                             <a className="sefara-link" href={`https://www.sefaria.org/${link.ref}?lang=he&with=all&lang2=he`} target="_blank">{lang.current.startsWith('en') ? 'Read on Sefaria' : 'עיין בספריא'}</a>
@@ -83,8 +83,12 @@ const ReaderRefsPanel = () => {
             });
             setLinks(newLinks);
         }
-        fetchAllResources();
-    }, [sefariaRef]);
+        if (sefariaRef) {
+            fetchAllResources().catch(err => {
+                console.error('Error fetching resources:', err);
+            });
+        }
+    }, [sefariaRef, lang]);
 
     return (
         <div className="refs-panel">
