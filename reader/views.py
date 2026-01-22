@@ -37,7 +37,6 @@ def daf_yomi(request, amud='a'):
         return render(request,
                     'dafyomi.html',
                     context={
-                        'app': json.dumps('reader'),
                         'amud': amud,
                         'component': json.dumps('PDFReader'),
                         'props': json.dumps({
@@ -63,7 +62,6 @@ def daf_yomi(request, amud='a'):
     return render(request,
                 'dafyomi.html',
                 context={
-                    'app': json.dumps('reader'),
                     'amud': amud,
                     'component': json.dumps('PDFReader'),
                     'props': json.dumps(page_data),
