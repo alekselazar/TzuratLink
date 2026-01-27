@@ -7,6 +7,7 @@ from PIL import Image
 from io import BytesIO
 import threading
 import time
+from django.core.cache import cache
 
 from .models import Page
 
@@ -34,6 +35,7 @@ def delete_page(page_id):
     try:
         page = Page.objects(id=page_id).first()
         if page:
+            # Cache invalidation is handled automatically by signals in core/apps.py
             page.delete()
             return True
         return None
@@ -51,6 +53,7 @@ def get_for_sref(sefaria_ref):
     """
     Get page data from MongoDB for a given Sefaria reference.
     Returns data formatted for React components.
+    Uses Redis cache to speed up repeated requests.
     
     Args:
         sefaria_ref: Sefaria reference string (e.g., "Berakhot:2a")
@@ -59,6 +62,12 @@ def get_for_sref(sefaria_ref):
         dict with keys: pageId, file, boxes, anchors
         Returns None if page not found
     """
+    # Check cache first
+    cache_key = f'page_data:{sefaria_ref}'
+    cached_data = cache.get(cache_key)
+    if cached_data is not None:
+        return cached_data
+    
     try:
         # Query MongoDB for page by ref
         page = Page.objects(ref=sefaria_ref).first()
@@ -90,12 +99,17 @@ def get_for_sref(sefaria_ref):
             })
         
         # Return data in format expected by React components
-        return {
+        result = {
             "pageId": str(page.id),
             "file": pdf_base64,
             "boxes": boxes,
             "anchors": []  # Empty for now, can be populated if needed
         }
+        
+        # Cache the result for 1 hour (3600 seconds)
+        cache.set(cache_key, result, 3600)
+        
+        return result
     except Exception as e:
         return None
 
