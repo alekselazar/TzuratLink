@@ -52,6 +52,37 @@ header {
     width: 100%;
 }
 
+.reader-page-container {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.reader-page-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    vertical-align: top;
+}
+
+.reader-page-container .boxes-layer,
+.reader-page-container .highlighted-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.reader-page-container .boxes-layer {
+    pointer-events: auto;
+}
+
+.reader-page-container .box {
+    pointer-events: auto;
+}
+
 .highlighted-box, .hover-box {
     background-color: var(--talmud);
     border: 1px solid var(--talmud);

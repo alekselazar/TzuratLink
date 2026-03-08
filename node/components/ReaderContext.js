@@ -24,7 +24,7 @@ export const ReaderStateProvider = ({ pageId, file, boxes, anchors, children }) 
             out[len] = bytes.charCodeAt(len);
         }
 
-        const blob = new Blob([out], { type: 'application/pdf' });
+        const blob = new Blob([out], { type: 'image/png' });
 
         return URL.createObjectURL(blob);
     }, [file]);

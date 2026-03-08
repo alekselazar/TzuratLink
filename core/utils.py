@@ -1,5 +1,3 @@
-import base64
-import urllib.request
 import threading
 from django.core.cache import cache
 
@@ -48,16 +46,8 @@ def get_for_sref(sefaria_ref):
         if not page:
             return None
         
-        # Fetch PDF from source_pdf and convert to base64
-        try:
-            req = urllib.request.Request(page.source_pdf, headers={
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            })
-            with urllib.request.urlopen(req) as res:
-                pdf_bytes = res.read()
-            pdf_base64 = base64.b64encode(pdf_bytes).decode("utf-8")
-        except Exception as e:
-            # If PDF fetch fails, return None
+        # Use stored PNG base64 from MongoDB (page.base64_data)
+        if not page.base64_data or not page.base64_data.strip():
             return None
         
         # Convert bboxes to format expected by React (with sefaria_ref instead of ref)
@@ -72,10 +62,10 @@ def get_for_sref(sefaria_ref):
                 "height": f"{float(bbox.height) * 100}%",
             })
         
-        # Return data in format expected by React components
+        # Return data in format expected by React components (file = PNG base64)
         result = {
             "pageId": str(page.id),
-            "file": pdf_base64,
+            "file": page.base64_data.strip(),
             "boxes": boxes,
             "anchors": []  # Empty for now, can be populated if needed
         }
