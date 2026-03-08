@@ -8,6 +8,24 @@ from core.utils import get_for_sref, get_for_sref_with_timeout
 def index(request):
     return redirect('daf yomi')
 
+def reader_catchall(request, path=''):
+    """
+    Catch-all route for client-side routing.
+    Serves the React app for any routes not explicitly handled by Django.
+    """
+    # Extract route info from request path
+    # request.path will be something like '/dafyomi/a' or '/some/other/path'
+    path_parts = request.path.strip('/').split('/')
+    
+    if len(path_parts) >= 2 and path_parts[0] == 'dafyomi':
+        amud = path_parts[1] if len(path_parts) > 1 else 'a'
+        # Use existing daf_yomi view logic
+        return daf_yomi(request, amud=amud)
+    
+    # For any other route, serve the React app (it will handle routing client-side)
+    # Default: redirect to daf yomi
+    return redirect('daf yomi')
+
 def daf_yomi(request, amud='a'):
     if request.method != 'GET':
         return JsonResponse({'error': "You are not permitted"}, status=403)
