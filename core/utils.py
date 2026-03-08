@@ -1,35 +1,9 @@
 import base64
-import json
-import urllib.request, urllib.error
-import pytesseract
-import fitz
-from PIL import Image
-from io import BytesIO
+import urllib.request
 import threading
-import time
 from django.core.cache import cache
 
 from .models import Page
-
-def convert_pdf(url):
-    try:
-        req = urllib.request.Request(url, headers={
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        })
-        with urllib.request.urlopen(req) as res:
-            pdf_bytes = res.read()
-
-        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
-        page = doc[0]
-        pix = page.get_pixmap(dpi=300)
-        img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-        ocr_data = pytesseract.image_to_data(img, lang="heb",output_type="dict")
-        buffer = BytesIO()
-        img.save(buffer, format="PNG")
-        b64 = base64.b64encode(buffer.getvalue()).decode("utf-8")
-        return b64, ocr_data
-    except urllib.error.URLError as e:
-        return None, None
 
 def delete_page(page_id):
     try:

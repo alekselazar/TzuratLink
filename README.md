@@ -25,6 +25,10 @@ After that we can manually select sentences on the page, linking them to relevan
 ### Translations
 We are using [OpenAI API](https://platform.openai.com/docs/overview) to generate and then edit translations to talmudic texts. It is part of Editor App.
 
+## Deployment
+
+For production deployment (settings, environment variables, Gunicorn, Node SSR, and reverse proxy), see [DEPLOYMENT.md](DEPLOYMENT.md).
+
 ## Conclusion
 
 TzuratLink, with its deep integration with Sefaria and sophisticated text mapping capabilities, represents a significant advancement in the study of Talmudic texts. Through innovative use of technology, we are not only preserving the traditional study methods but also enhancing them, making Talmud study more interactive, accessible, and engaging. As the project progresses through development, we anticipate TzuratLink will become an indispensable tool for scholars and students alike, embodying the perfect fusion of tradition and digital innovation.

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
+from django.conf import settings
 import json
 import urllib.request
 import threading
@@ -115,8 +116,9 @@ def get_ssr_html(component, props, timeout=1.0):
                     'props': props
                 }).encode('utf-8')
                 
+                ssr_url = getattr(settings, 'SSR_SERVICE_URL', 'http://localhost:3000').rstrip('/')
                 req = urllib.request.Request(
-                    'http://localhost:3000/render',
+                    f'{ssr_url}/render',
                     data=data,
                     headers={
                         'Content-Type': 'application/json',
