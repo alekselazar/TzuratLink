@@ -4,6 +4,7 @@ Copy to settings.py and set environment variables (see .env.example).
 """
 import os
 from pathlib import Path
+from urllib.parse import quote_plus
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -61,9 +62,17 @@ DATABASES = {
     }
 }
 
-# MongoDB (MongoEngine) – used by core app
+# MongoDB (MongoEngine) – used by core app (Atlas: user/pass from .env)
 MONGODB_NAME = os.environ.get("MONGODB_NAME", "tzuratlink")
-MONGODB_HOST = os.environ.get("MONGODB_HOST", "mongodb://localhost:27017")
+_mongo_host = os.environ.get("MONGODB_HOST", "localhost:27017")
+_mongo_user = os.environ.get("MONGODB_USER", "")
+_mongo_pass = os.environ.get("MONGODB_PASSWORD", "")
+if _mongo_user and _mongo_pass:
+    _mongo_user_esc = quote_plus(_mongo_user)
+    _mongo_pass_esc = quote_plus(_mongo_pass)
+    MONGODB_HOST = f"mongodb+srv://{_mongo_user_esc}:{_mongo_pass_esc}@{_mongo_host}"
+else:
+    MONGODB_HOST = f"mongodb://{_mongo_host}"
 
 # Redis cache
 REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
@@ -101,5 +110,6 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    # Set to True if behind HTTPS proxy (e.g. nginx)
+    # Set to True when Nginx (or another proxy) terminates HTTPS
     SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "false").lower() in ("1", "true", "yes")
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

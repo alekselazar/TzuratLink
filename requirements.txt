@@ -1,5 +1,6 @@
 Django==4.2.16
 mongoengine==0.27.0
+pymongo>=4.6,<4.9
 django-redis==5.4.0
 redis==5.0.1
 gunicorn==23.0.0
