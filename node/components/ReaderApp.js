@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, useParams, useLocation } from 'react-router-dom';
 import PDFReader from './PDFReader';
 import Navigation from './Navigation';
-import '@react-pdf-viewer/core/lib/styles/index.css';
 
 // Component that handles route-based rendering
 const RouteHandler = ({ initialComponent, initialProps }) => {
@@ -12,7 +11,9 @@ const RouteHandler = ({ initialComponent, initialProps }) => {
     // If we have initial props from SSR, use them
     // Otherwise, fetch based on current route
     const component = initialComponent || 'PDFReader';
-    const props = initialProps || {};
+    const rawProps = initialProps || {};
+    // Strip 'ref' from props so it's not passed as React's ref (reserved); pass as initialRef for CSR
+    const { ref: initialRef, ...props } = rawProps;
     
     // Replace server-rendered navigation with React Router navigation
     React.useEffect(() => {
@@ -25,7 +26,7 @@ const RouteHandler = ({ initialComponent, initialProps }) => {
     return (
         <>
             <Navigation />
-            <PDFReader {...props} routeParams={params} pathname={location.pathname} />
+            <PDFReader {...props} initialRef={initialRef} routeParams={params} pathname={location.pathname} />
         </>
     );
 };

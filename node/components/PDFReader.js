@@ -68,12 +68,12 @@ const PDFReader = (props) => {
                 }
             };
             fetchDataForRoute();
-        } else if (props.csr && props.ref) {
-            // Original CSR logic
+        } else if (props.csr && props.initialRef) {
+            // Original CSR logic (initialRef = Sefaria ref from server, not React ref)
             const fetchData = async () => {
                 try {
                     setLoading(true);
-                    const response = await fetch(`/api/page/${encodeURIComponent(props.ref)}`);
+                    const response = await fetch(`/api/page/${encodeURIComponent(props.initialRef)}`);
                     if (!response.ok) {
                         throw new Error('Failed to fetch page data');
                     }
@@ -87,7 +87,7 @@ const PDFReader = (props) => {
             };
             fetchData();
         }
-    }, [params.amud, props.csr, props.ref, props.pageId, props.pathname]);
+    }, [params.amud, props.csr, props.initialRef, props.pageId, props.pathname]);
 
     // Show loading state during CSR fetch (only on client)
     if (typeof window !== 'undefined' && loading) {
@@ -120,9 +120,10 @@ const PDFReader = (props) => {
         );
     }
 
-    // Render normally (works for both SSR and CSR)
+    // Render normally (works for both SSR and CSR). Omit 'ref' so it's never passed as React ref.
+    const { ref: _omit, ...providerProps } = pageData;
     return (
-        <ReaderStateProvider {...pageData}>
+        <ReaderStateProvider {...providerProps}>
             <PDFLayout />
         </ReaderStateProvider>
     );
