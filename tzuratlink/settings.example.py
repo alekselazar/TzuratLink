@@ -8,6 +8,10 @@ from urllib.parse import quote_plus
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load .env from project root so env vars are available for settings below
+from dotenv import load_dotenv
+load_dotenv(BASE_DIR / ".env")
+
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "change-me-in-production-use-a-long-random-string"
@@ -38,6 +42,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "tzuratlink.urls"
 WSGI_APPLICATION = "tzuratlink.wsgi.application"
+
+# Ensure /dafyomi redirects to /dafyomi/ (CommonMiddleware); if False, /dafyomi can 404
+APPEND_SLASH = True
 
 TEMPLATES = [
     {

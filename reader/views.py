@@ -1,10 +1,16 @@
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 import json
 import urllib.request
 import threading
 from core.utils import get_for_sref, get_for_sref_with_timeout
+
+
+def health(request):
+    """Simple health check for Docker/load balancers; no redirect, no DB."""
+    return HttpResponse("ok", content_type="text/plain")
+
 
 def index(request):
     return redirect('daf yomi')
