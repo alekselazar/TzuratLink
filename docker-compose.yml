@@ -1,4 +1,4 @@
-# TzuratLink – Docker deployment: Nginx (gateway + load balancer), Django, Node SSR, Redis.
+# TzuratLink – Docker deployment: Nginx (gateway), Django, Redis
 # Mongo: use MongoDB Atlas (set MONGODB_* in .env). No mongo container.
 
 services:
@@ -33,27 +33,18 @@ services:
       - MONGODB_USER=${MONGODB_USER}
       - MONGODB_PASSWORD=${MONGODB_PASSWORD}
       - REDIS_URL=redis://redis:6379/0
-      - SSR_SERVICE_URL=http://ssr:3000
       - STATIC_ROOT=/static
       - SECURE_SSL_REDIRECT=${SECURE_SSL_REDIRECT:-false}
     volumes:
       - static_files:/static
     depends_on:
       redis: { condition: service_healthy }
-      ssr: { condition: service_started }
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
       interval: 15s
       timeout: 5s
       retries: 3
       start_period: 30s
-
-  ssr:
-    build: ./node
-    image: tzuratlink-ssr
-    container_name: tzuratlink-ssr
-    restart: unless-stopped
-    # No ports exposed – only Django talks to SSR
 
   redis:
     image: redis:7-alpine

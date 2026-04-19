@@ -31,6 +31,7 @@ class BBox(EmbeddedDocument):
     """
 
     ref = StringField(required=True)  # e.g. "Berakhot 2a:1" or "Rashi Berakhot 2a"
+    hebrew_title = StringField()  # Hebrew title for the ref (optional)
     top = FloatField(required=True, min_value=0)
     left = FloatField(required=True, min_value=0)
     width = FloatField(required=True, min_value=0)
@@ -56,6 +57,7 @@ class BBox(EmbeddedDocument):
     def to_dict(self) -> dict:
         return {
             "ref": self.ref,
+            "hebrew_title": self.hebrew_title,
             "top": float(self.top),
             "left": float(self.left),
             "width": float(self.width),
@@ -83,11 +85,11 @@ class Page(Document):
     # Page identifier (your logical reference, e.g. "Berakhot 2a")
     ref = StringField(required=True)
 
+    # Hebrew title for the page (optional)
+    hebrew_title = StringField()
+
     # Link to the PDF that the page came from
     source_pdf = URLField(required=True)
-
-    # Base64-encoded payload (commonly PNG/JPEG bytes encoded as base64)
-    base64_data = StringField(required=True)
 
     # Bounding boxes embedded within the page document
     bboxes = ListField(EmbeddedDocumentField(BBox), default=list)
@@ -100,9 +102,6 @@ class Page(Document):
         if not self.ref or not self.ref.strip():
             raise ValidationError("Page.ref must be a non-empty string.")
         self.ref = self.ref.strip()
-
-        if not self.base64_data or not self.base64_data.strip():
-            raise ValidationError("Page.base64_data must be a non-empty base64 string.")
 
         # Optional: basic sanity check that bboxes are unique by ref within a page.
         # If you want to allow multiple boxes per ref, remove this block.
@@ -123,8 +122,8 @@ class Page(Document):
         return {
             "id": str(self.id),
             "ref": self.ref,
+            "hebrew_title": self.hebrew_title,
             "source_pdf": self.source_pdf,
-            "base64_data": self.base64_data,
             "bboxes": [b.to_dict() for b in (self.bboxes or [])],
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
