@@ -1,44 +1,32 @@
 <!DOCTYPE html>
-<html lang="{{ lang }}">
+<html>
 {% load static %}
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ page_title }}</title>
-    <meta name="description" content="{{ page_description }}" />
-    <meta name="canonical" content="{{ canonical_url }}" />
-    
-    <!-- Open Graph for social sharing -->
-    <meta property="og:title" content="{{ page_title }}" />
-    <meta property="og:description" content="{{ page_description }}" />
-    <meta property="og:url" content="{{ canonical_url }}" />
-    <meta property="og:type" content="website" />
-    {% if page_image %}<meta property="og:image" content="data:image/png;base64,{{ page_image|truncatechars:500 }}" />{% endif %}
-    
-    <!-- JSON-LD Structured Data for Search Engines -->
-    <script type="application/ld+json">
-    {{ structured_data|safe }}
-    </script>
-    
+    <title>TzuratLink {% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/reader.css' %}"/>
 </head>
-<body style="direction: {{ direction }}">
+<body>
     <script>
         const djangoComponent = JSON.parse('{{ component|escapejs }}');
         const djangoProps = JSON.parse('{{ props|escapejs }}');
-        const pageRef = '{{ ref|escapejs }}';
-        const pageLanguage = '{{ lang|escapejs }}';
     </script>
     <header>
         <img id="logo" src="{% static "img/logo.png" %}" alt="Logo">
         <h1 id="title">TzuratLink</h1>
     </header>
     <nav id="main-nav">
-        <!-- Navigation will be rendered by React component -->
+        {% block navigate %}
+        {% endblock %}
     </nav>
     <div id="app">
-        <!-- CSR: React will mount here -->
-        <h1>Loading...</h1>
+        {% block content %}
+        {% endblock  %}
+        {% if ssr_html %}
+            {{ ssr_html|safe }}
+        {% else %}
+            <h1>Loading...</h1>
+        {% endif %}
     </div>
     <script src="{% static 'js/bundle.js' %}"></script>
 </body>

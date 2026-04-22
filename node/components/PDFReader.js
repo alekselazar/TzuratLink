@@ -1,31 +1,29 @@
-import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ReaderStateProvider, useReaderState } from './ReaderContext';
 import ReaderPDFView from './ReaderPDFView';
 import ReaderRefsPanel from './ReaderRefsPanel';
-import PageTitle from './PageTitle';
 
-const PDFLayout = ({ pageRef, hebrewTitle, lang = 'he' }) => {
+const PDFLayout = () => {
     
     const sefariaRef = useReaderState((ctx) => ctx.sefariaRef);
+    const lang = useReaderState((ctx) => ctx.lang);
 
     return (
-        <>
-            <PageTitle pageRef={pageRef} hebrewTitle={hebrewTitle} lang={lang} />
-            <div className='pdf-reader' style={{ direction: lang === 'en' ? 'ltr' : 'rtl' }}>
-                <div style={{ width: sefariaRef ? '75%' : '100%', position: 'relative' }}>
-                    <ReaderPDFView />
-                </div>
-                <div style={{ width: '25%', padding: '0px 20px', display: sefariaRef ? 'block' : 'none' }}>
-                    <ReaderRefsPanel />                    
-                </div>
+        <div className='pdf-reader' style={{ direction: lang.current.startsWith('en') ? 'ltl' : 'rtl' }}>
+            <div style={{ width: sefariaRef ? '75%' : '100%', position: 'relative' }}>
+                <ReaderPDFView />
             </div>
-        </>
+            <div style={{ width: '25%', padding: '0px 20px', display: sefariaRef ? 'block' : 'none' }}>
+                <ReaderRefsPanel />                    
+            </div>
+        </div>
     )
 }
 
 const PDFReader = (props) => {
     const params = useParams();
+    const navigate = useNavigate();
     const [pageData, setPageData] = useState(props);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -35,16 +33,51 @@ const PDFReader = (props) => {
         if (typeof window === 'undefined') return;
         
         // If we have route params (client-side navigation), fetch data
-        if (params.ref && (!props.pageId || props.pathname !== window.location.pathname)) {
+        if (params.amud && (!props.pageId || props.pathname !== window.location.pathname)) {
             const fetchDataForRoute = async () => {
                 try {
                     setLoading(true);
-                    // Fetch page data using ref from route
-                    const pageResponse = await fetch(`/api/page/${encodeURIComponent(params.ref)}`);
-                    if (!pageResponse.ok) {
+                    // Get ref based on amud parameter
+                    const response = await fetch('https://www.sefaria.org/api/calendars');
+                    const json_data = await response.json();
+                    let ref = null;
+                    for (const item of json_data.calendar_items) {
+                        if (item.title.en === 'Daf Yomi') {
+                            ref = ':'.join(item.ref.split(' '));
+                            break;
+                        }
+                    }
+                    if (ref) {
+                        if (params.amud === 'a') {
+                            ref += 'a';
+                        } else if (params.amud === 'b') {
+                            ref += 'b';
+                        }
+                        // Fetch page data
+                        const pageResponse = await fetch(`/api/page/${encodeURIComponent(ref)}`);
+                        if (!pageResponse.ok) {
+                            throw new Error('Failed to fetch page data');
+                        }
+                        const data = await pageResponse.json();
+                        setPageData(data);
+                        setLoading(false);
+                    }
+                } catch (err) {
+                    setError(err.message);
+                    setLoading(false);
+                }
+            };
+            fetchDataForRoute();
+        } else if (props.csr && props.initialRef) {
+            // Original CSR logic (initialRef = Sefaria ref from server, not React ref)
+            const fetchData = async () => {
+                try {
+                    setLoading(true);
+                    const response = await fetch(`/api/page/${encodeURIComponent(props.initialRef)}`);
+                    if (!response.ok) {
                         throw new Error('Failed to fetch page data');
                     }
-                    const data = await pageResponse.json();
+                    const data = await response.json();
                     setPageData(data);
                     setLoading(false);
                 } catch (err) {
@@ -52,13 +85,9 @@ const PDFReader = (props) => {
                     setLoading(false);
                 }
             };
-            fetchDataForRoute();
-        } else if (!params.ref && props.initialRef) {
-            // Use initial data from server props (SSR/initial load)
-            // No need to fetch if we already have data from server
-            setPageData(props);
+            fetchData();
         }
-    }, [params.ref, props.initialRef, props.pageId, props.pathname]);
+    }, [params.amud, props.csr, props.initialRef, props.pageId, props.pathname]);
 
     // Show loading state during CSR fetch (only on client)
     if (typeof window !== 'undefined' && loading) {
@@ -91,21 +120,11 @@ const PDFReader = (props) => {
         );
     }
 
-    // Render normally (works for both SSR and CSR). Omit 'ref' and 'hebrew_title' so they're not passed as React reserved props.
-    const { ref: serverRef, hebrew_title: serverHebrewTitle, ...providerProps } = pageData;
-    
-    // Get the actual page ref and hebrew_title
-    // Priority: route params > server props > initial props
-    const pageRef = params.ref || serverRef || props.initialRef;
-    const hebrewTitle = serverHebrewTitle || props.initialHebrewTitle;
-    const lang = props.initialLanguage || 'he';
-    
+    // Render normally (works for both SSR and CSR). Omit 'ref' so it's never passed as React ref.
+    const { ref: _omit, ...providerProps } = pageData;
     return (
-        <ReaderStateProvider 
-            {...providerProps}
-            initialLanguage={props.initialLanguage}
-        >
-            <PDFLayout pageRef={pageRef} hebrewTitle={hebrewTitle} lang={lang} />
+        <ReaderStateProvider {...providerProps}>
+            <PDFLayout />
         </ReaderStateProvider>
     );
 };

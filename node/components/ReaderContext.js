@@ -7,31 +7,27 @@ export const useReaderState = (selector) => {
     return selector(context);
 };
 
-/**
- * Normalize language to 'en' or 'he' (Hebrew for any non-English)
- */
-const normalizeLanguage = (langStr) => {
-    if (!langStr) return 'he';
-    const lang = langStr.toString().toLowerCase().substring(0, 2);
-    return lang === 'en' ? 'en' : 'he';
-};
-
-export const ReaderStateProvider = ({ pageId, pdfUrl, boxes, anchors, initialLanguage, children }) => {
+export const ReaderStateProvider = ({ pageId, file, boxes, anchors, children }) => {
 
     const idRef = useRef(pageId);
+    const lang = useRef(typeof window !== 'undefined' ? navigator.language : 'en');
 
-    // Use initialLanguage from server (Django), otherwise detect from navigator
-    const getInitialLanguage = () => {
-        if (initialLanguage) {
-            return normalizeLanguage(initialLanguage);
-        }
-        if (typeof window !== 'undefined') {
-            return normalizeLanguage(navigator.language);
-        }
-        return 'he';
-    };
+    const fileBlobUrl = useMemo(() => {
+        if (!file || typeof window === 'undefined') return null;
+        
+        const bytes = atob(file);
 
-    const lang = useRef(getInitialLanguage());
+        let len = bytes.length;
+        let out = new Uint8Array(len);
+
+        while (len--) {
+            out[len] = bytes.charCodeAt(len);
+        }
+
+        const blob = new Blob([out], { type: 'image/png' });
+
+        return URL.createObjectURL(blob);
+    }, [file]);
 
     const [sefariaRef, setSefariaRef] = useState('');
     const [highlightedBoxes, setHighlightedBoxes] = useState([]);
@@ -58,7 +54,7 @@ export const ReaderStateProvider = ({ pageId, pdfUrl, boxes, anchors, initialLan
             setWarning,
             idRef,
             lang,
-            pdfUrl
+            fileBlobUrl
         }
     ), [
         sefariaRef,
@@ -68,7 +64,7 @@ export const ReaderStateProvider = ({ pageId, pdfUrl, boxes, anchors, initialLan
         text,
         related,
         warning,
-        pdfUrl
+        fileBlobUrl
     ]);
 
     return (
