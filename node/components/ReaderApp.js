@@ -1,55 +1,47 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useParams, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import PDFReader from './PDFReader';
-import Navigation from './Navigation';
+import LibraryHome from './LibraryHome';
+import TractateView from './TractateView';
 
-// Component that handles route-based rendering
-const RouteHandler = ({ initialComponent, initialProps }) => {
+const RouteHandler = ({ initialProps, initialLanguage }) => {
     const location = useLocation();
     const params = useParams();
-    
-    // If we have initial props from SSR, use them
-    // Otherwise, fetch based on current route
-    const component = initialComponent || 'PDFReader';
-    const rawProps = initialProps || {};
-    // Strip 'ref' from props so it's not passed as React's ref (reserved); pass as initialRef for CSR
-    const { ref: initialRef, ...props } = rawProps;
-    
-    // Replace server-rendered navigation with React Router navigation
+
     React.useEffect(() => {
-        const serverNav = document.getElementById('main-nav');
-        if (serverNav) {
-            serverNav.innerHTML = ''; // Clear server-rendered nav
-        }
+        const nav = document.getElementById('main-nav');
+        if (nav) nav.innerHTML = '';
     }, []);
-    
+
+    const rawProps = initialProps || {};
+    const { ref: initialRef, hebrew_title: initialHebrewTitle, ...rest } = rawProps;
+
     return (
         <>
-            <Navigation />
-            <PDFReader {...props} initialRef={initialRef} routeParams={params} pathname={location.pathname} />
+            <PDFReader
+                {...rest}
+                initialRef={initialRef}
+                initialHebrewTitle={initialHebrewTitle}
+                routeParams={params}
+                pathname={location.pathname}
+                initialLanguage={initialLanguage}
+            />
         </>
     );
 };
 
-const ReaderApp = ({ component, props }) => {
+const ReaderApp = ({ props, initialLanguage }) => {
+    const lang = (props && props.lang) || initialLanguage || 'he';
     return (
         <BrowserRouter>
             <Routes>
-                {/* Main route - handles /dafyomi/:amud */}
-                <Route 
-                    path="/dafyomi/:amud?" 
-                    element={<RouteHandler initialComponent={component} initialProps={props} />} 
+                <Route path="/" element={<LibraryHome lang={lang} />} />
+                <Route path="/tractate/:name" element={<TractateView />} />
+                <Route
+                    path="/page/:ref"
+                    element={<RouteHandler initialProps={props} initialLanguage={lang} />}
                 />
-                {/* Root redirects to dafyomi */}
-                <Route 
-                    path="/" 
-                    element={<RouteHandler initialComponent={component} initialProps={props} />} 
-                />
-                {/* Catch-all for other routes */}
-                <Route 
-                    path="*" 
-                    element={<RouteHandler initialComponent={component} initialProps={props} />} 
-                />
+                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </BrowserRouter>
     );

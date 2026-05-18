@@ -12,8 +12,10 @@
         const djangoProps = JSON.parse('{{ props|escapejs }}');
     </script>
     <header>
-        <img id="logo" src="{% static "img/logo.png" %}" alt="Logo">
-        <h1 id="title">TzuratLink</h1>
+        <a href="/">
+            <img id="logo" src="{% static "img/logo.png" %}" alt="Logo">
+            <h1 id="title">TzuratLink</h1>
+        </a>
     </header>
     <nav id="main-nav">
         {% block navigate %}
@@ -22,11 +24,6 @@
     <div id="app">
         {% block content %}
         {% endblock  %}
-        {% if ssr_html %}
-            {{ ssr_html|safe }}
-        {% else %}
-            <h1>Loading...</h1>
-        {% endif %}
     </div>
     <script src="{% static 'js/bundle.js' %}"></script>
 </body>

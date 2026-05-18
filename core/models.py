@@ -21,6 +21,15 @@ from mongoengine import (
     ValidationError,
 )
 
+class CropBox(EmbeddedDocument):
+    """
+    Fractions (0-1) of the full-rendered PDF page that contain actual content.
+    Used to crop the page image on demand without storing base64 in the DB.
+    """
+    left   = FloatField(required=True, min_value=0, max_value=1)
+    top    = FloatField(required=True, min_value=0, max_value=1)
+    right  = FloatField(required=True, min_value=0, max_value=1)
+    bottom = FloatField(required=True, min_value=0, max_value=1)
 
 class BBox(EmbeddedDocument):
     """
@@ -30,7 +39,7 @@ class BBox(EmbeddedDocument):
     top/left represent the upper-left corner.
     """
 
-    ref = StringField(required=True)  # e.g. "Berakhot 2a:1" or "Rashi Berakhot 2a"
+    ref = StringField(required=True)          # display ref, e.g. "Shekalim 2a:1"
     top = FloatField(required=True, min_value=0)
     left = FloatField(required=True, min_value=0)
     width = FloatField(required=True, min_value=0)
@@ -80,14 +89,17 @@ class Page(Document):
         ],
     }
 
-    # Page identifier (your logical reference, e.g. "Berakhot 2a")
+    # Display reference used in our URLs, e.g. "Shekalim 2a"
     ref = StringField(required=True)
+
+    # Sefaria API reference when it differs from ref, e.g. "Jerusalem Talmud Shekalim 2a"
+    # Falls back to ref when not set.
+    sefaria_ref = StringField(required=False)
 
     # Link to the PDF that the page came from
     source_pdf = URLField(required=True)
 
-    # Base64-encoded payload (commonly PNG/JPEG bytes encoded as base64)
-    base64_data = StringField(required=True)
+    crop_box = EmbeddedDocumentField(CropBox)
 
     # Bounding boxes embedded within the page document
     bboxes = ListField(EmbeddedDocumentField(BBox), default=list)
@@ -101,9 +113,6 @@ class Page(Document):
             raise ValidationError("Page.ref must be a non-empty string.")
         self.ref = self.ref.strip()
 
-        if not self.base64_data or not self.base64_data.strip():
-            raise ValidationError("Page.base64_data must be a non-empty base64 string.")
-
         # Optional: basic sanity check that bboxes are unique by ref within a page.
         # If you want to allow multiple boxes per ref, remove this block.
         seen = set()
@@ -115,6 +124,9 @@ class Page(Document):
                 raise ValidationError(f"Duplicate bbox ref within page: '{r}'")
             seen.add(r)
 
+    def effective_sefaria_ref(self) -> str:
+        return self.sefaria_ref or self.ref
+
     def save(self, *args, **kwargs):
         self.updated_at = datetime.datetime.utcnow()
         return super().save(*args, **kwargs)
@@ -123,8 +135,12 @@ class Page(Document):
         return {
             "id": str(self.id),
             "ref": self.ref,
+            "sefaria_ref": self.effective_sefaria_ref(),
             "source_pdf": self.source_pdf,
-            "base64_data": self.base64_data,
+            "crop_box": {
+                "left": self.crop_box.left, "top": self.crop_box.top,
+                "right": self.crop_box.right, "bottom": self.crop_box.bottom,
+            } if self.crop_box else None,
             "bboxes": [b.to_dict() for b in (self.bboxes or [])],
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,

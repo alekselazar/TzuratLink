@@ -10,36 +10,30 @@ const ReaderBoxesLayer = React.memo(() => {
     // Sync highlighted boxes when sefariaRef changes (but not on hover)
     useEffect(() => {
         if (sefariaRef) {
-            const matchingBoxes = existingBoxes.filter((box) => box.sefaria_ref === sefariaRef);
+            const matchingBoxes = existingBoxes.filter((box) => box.ref === sefariaRef);
             setHighlightedBoxes(matchingBoxes);
         }
         // Don't clear on sefariaRef change to empty - let hover handle that
     }, [sefariaRef, existingBoxes, setHighlightedBoxes]);
-    
+
     const handleMouseOver = (ref) => {
-        // Highlight all boxes with the same ref
-        const matchingBoxes = existingBoxes.filter((box) => box.sefaria_ref === ref);
-        // If there's already a selected ref, keep those highlighted, otherwise just show hover
+        const matchingBoxes = existingBoxes.filter((box) => box.ref === ref);
         if (sefariaRef && sefariaRef === ref) {
-            // Already selected, keep it highlighted
             return;
         }
         setHighlightedBoxes(matchingBoxes);
     };
 
     const handleMouseLeave = (ref) => {
-        // If this ref is the selected one, keep it highlighted
         if (sefariaRef && sefariaRef === ref) {
-            setHighlightedBoxes(existingBoxes.filter((box) => box.sefaria_ref === ref));
+            setHighlightedBoxes(existingBoxes.filter((box) => box.ref === ref));
         } else {
-            // Otherwise, clear the hover highlight
             setHighlightedBoxes([]);
         }
     };
 
     const handleClick = (ref) => {
-        // Highlight all boxes with the same ref and set as selected
-        const matchingBoxes = existingBoxes.filter((box) => box.sefaria_ref === ref);
+        const matchingBoxes = existingBoxes.filter((box) => box.ref === ref);
         setHighlightedBoxes(matchingBoxes);
         setSefariaRef(ref);
     };
@@ -49,7 +43,7 @@ const ReaderBoxesLayer = React.memo(() => {
             {
                 existingBoxes.map((box, i) => (
                     <div
-                        key={`${box.sefaria_ref}-${i}`}
+                        key={`${box.ref}-${i}`}
                         className="box"
                         style={{
                             top: box.top,
@@ -57,9 +51,9 @@ const ReaderBoxesLayer = React.memo(() => {
                             height: box.height,
                             width: box.width
                         }}
-                        onMouseOver={() => handleMouseOver(box.sefaria_ref)}
-                        onMouseLeave={() => handleMouseLeave(box.sefaria_ref)}
-                        onClick={() => handleClick(box.sefaria_ref)}
+                        onMouseOver={() => handleMouseOver(box.ref)}
+                        onMouseLeave={() => handleMouseLeave(box.ref)}
+                        onClick={() => handleClick(box.ref)}
                     />
                 ))
             }

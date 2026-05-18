@@ -1,130 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { ReaderStateProvider, useReaderState } from './ReaderContext';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { ReaderStateProvider } from './ReaderContext';
 import ReaderPDFView from './ReaderPDFView';
 import ReaderRefsPanel from './ReaderRefsPanel';
+import { useReaderState } from './ReaderContext';
 
-const PDFLayout = () => {
-    
+const PDFLayout = ({ lang }) => {
     const sefariaRef = useReaderState((ctx) => ctx.sefariaRef);
-    const lang = useReaderState((ctx) => ctx.lang);
-
     return (
-        <div className='pdf-reader' style={{ direction: lang.current.startsWith('en') ? 'ltl' : 'rtl' }}>
-            <div style={{ width: sefariaRef ? '75%' : '100%', position: 'relative' }}>
+        <div className="pdf-reader" style={{ direction: lang === 'en' ? 'ltr' : 'rtl' }}>
+            <div style={{ flex: sefariaRef ? '0 0 75%' : '0 0 100%', position: 'relative', transition: 'flex-basis 0.3s' }}>
                 <ReaderPDFView />
             </div>
-            <div style={{ width: '25%', padding: '0px 20px', display: sefariaRef ? 'block' : 'none' }}>
-                <ReaderRefsPanel />                    
+            <div style={{ flex: '0 0 25%', display: sefariaRef ? 'flex' : 'none', flexDirection: 'column', overflow: 'hidden' }}>
+                <ReaderRefsPanel />
             </div>
         </div>
-    )
-}
+    );
+};
 
-const PDFReader = (props) => {
+const PDFReader = ({ pageId, pdfUrl, boxes, anchors, initialRef, initialLanguage }) => {
     const params = useParams();
-    const navigate = useNavigate();
-    const [pageData, setPageData] = useState(props);
+    const [providerProps, setProviderProps] = useState({ pageId, pdfUrl, boxes: boxes || [], anchors: anchors || [] });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Handle client-side navigation based on route params
     useEffect(() => {
-        if (typeof window === 'undefined') return;
-        
-        // If we have route params (client-side navigation), fetch data
-        if (params.amud && (!props.pageId || props.pathname !== window.location.pathname)) {
-            const fetchDataForRoute = async () => {
-                try {
-                    setLoading(true);
-                    // Get ref based on amud parameter
-                    const response = await fetch('https://www.sefaria.org/api/calendars');
-                    const json_data = await response.json();
-                    let ref = null;
-                    for (const item of json_data.calendar_items) {
-                        if (item.title.en === 'Daf Yomi') {
-                            ref = ':'.join(item.ref.split(' '));
-                            break;
-                        }
-                    }
-                    if (ref) {
-                        if (params.amud === 'a') {
-                            ref += 'a';
-                        } else if (params.amud === 'b') {
-                            ref += 'b';
-                        }
-                        // Fetch page data
-                        const pageResponse = await fetch(`/api/page/${encodeURIComponent(ref)}`);
-                        if (!pageResponse.ok) {
-                            throw new Error('Failed to fetch page data');
-                        }
-                        const data = await pageResponse.json();
-                        setPageData(data);
-                        setLoading(false);
-                    }
-                } catch (err) {
-                    setError(err.message);
-                    setLoading(false);
-                }
-            };
-            fetchDataForRoute();
-        } else if (props.csr && props.initialRef) {
-            // Original CSR logic (initialRef = Sefaria ref from server, not React ref)
-            const fetchData = async () => {
-                try {
-                    setLoading(true);
-                    const response = await fetch(`/api/page/${encodeURIComponent(props.initialRef)}`);
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch page data');
-                    }
-                    const data = await response.json();
-                    setPageData(data);
-                    setLoading(false);
-                } catch (err) {
-                    setError(err.message);
-                    setLoading(false);
-                }
-            };
-            fetchData();
-        }
-    }, [params.amud, props.csr, props.initialRef, props.pageId, props.pathname]);
+        if (!params.ref) return;
+        // If server already gave us data for this exact ref, use it
+        if (pageId && initialRef === params.ref) return;
 
-    // Show loading state during CSR fetch (only on client)
-    if (typeof window !== 'undefined' && loading) {
-        return (
-            <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                height: '100vh',
-                fontSize: '18px'
-            }}>
-                Loading page data...
-            </div>
-        );
-    }
+        setLoading(true);
+        fetch(`/api/page/${encodeURIComponent(params.ref)}`)
+            .then(r => { if (!r.ok) throw new Error('Not found'); return r.json(); })
+            .then(data => {
+                const { ref: _r, ...rest } = data;
+                setProviderProps(rest);
+                setLoading(false);
+            })
+            .catch(err => { setError(err.message); setLoading(false); });
+    }, [params.ref]);
 
-    // Show error state if CSR fetch failed (only on client)
-    if (typeof window !== 'undefined' && error) {
-        return (
-            <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
-                height: '100vh',
-                fontSize: '18px',
-                color: 'red'
-            }}>
-                Error: {error}
-            </div>
-        );
-    }
+    if (loading) return (
+        <div className="pdf-loading"><div className="pdf-spinner" /></div>
+    );
+    if (error) return (
+        <div className="pdf-loading" style={{ color: '#c0392b' }}>Error: {error}</div>
+    );
 
-    // Render normally (works for both SSR and CSR). Omit 'ref' so it's never passed as React ref.
-    const { ref: _omit, ...providerProps } = pageData;
     return (
-        <ReaderStateProvider {...providerProps}>
-            <PDFLayout />
+        <ReaderStateProvider {...providerProps} pageRef={params.ref} initialLanguage={initialLanguage}>
+            <PDFLayout lang={initialLanguage} />
+            <footer className="page-copyright">
+                © All rights reserved to Vageshel. Content retrieved from Daf Yomi portal.
+            </footer>
         </ReaderStateProvider>
     );
 };

@@ -1,4 +1,4 @@
-import React, { useContext, createContext, useState, useRef, useMemo } from "react";
+import { useContext, createContext, useState, useRef, useMemo } from "react";
 
 const ReaderContext = createContext(null);
 
@@ -7,70 +7,32 @@ export const useReaderState = (selector) => {
     return selector(context);
 };
 
-export const ReaderStateProvider = ({ pageId, file, boxes, anchors, children }) => {
-
+export const ReaderStateProvider = ({ pageRef, pageId, pdfUrl, boxes, anchors, initialLanguage, children }) => {
     const idRef = useRef(pageId);
-    const lang = useRef(typeof window !== 'undefined' ? navigator.language : 'en');
 
-    const fileBlobUrl = useMemo(() => {
-        if (!file || typeof window === 'undefined') return null;
-        
-        const bytes = atob(file);
+    const lang = useRef(
+        initialLanguage
+            ? initialLanguage.substring(0, 2).toLowerCase()
+            : (typeof window !== 'undefined' ? navigator.language : 'he')
+    );
 
-        let len = bytes.length;
-        let out = new Uint8Array(len);
-
-        while (len--) {
-            out[len] = bytes.charCodeAt(len);
-        }
-
-        const blob = new Blob([out], { type: 'image/png' });
-
-        return URL.createObjectURL(blob);
-    }, [file]);
-
-    const [sefariaRef, setSefariaRef] = useState('');
+    const [sefariaRef, setSefariaRef] = useState(() => boxes?.[0]?.ref || '');
     const [highlightedBoxes, setHighlightedBoxes] = useState([]);
-    const [hoverBoxes, setHoverBoxes] = useState([]);
     const [existingBoxes, setExistingBoxes] = useState(boxes);
-    const [text, setText] = useState('');
-    const [related, setRelated] = useState({});
-    const [warning, setWarning] = useState('');
-    const contextValue = useMemo(() => (
-        {
-            sefariaRef,
-            highlightedBoxes,
-            hoverBoxes,
-            existingBoxes,
-            text,
-            related,
-            warning,
-            setSefariaRef,
-            setHighlightedBoxes,
-            setHoverBoxes,
-            setExistingBoxes,
-            setText,
-            setRelated,
-            setWarning,
-            idRef,
-            lang,
-            fileBlobUrl
-        }
-    ), [
-        sefariaRef,
-        highlightedBoxes,
-        hoverBoxes,
-        existingBoxes,
-        text,
-        related,
-        warning,
-        fileBlobUrl
-    ]);
+
+    const contextValue = useMemo(() => ({
+        pageRef,
+        sefariaRef, setSefariaRef,
+        highlightedBoxes, setHighlightedBoxes,
+        existingBoxes, setExistingBoxes,
+        idRef,
+        lang,
+        pdfUrl,
+    }), [pageRef, sefariaRef, highlightedBoxes, existingBoxes, pdfUrl]);
 
     return (
         <ReaderContext.Provider value={contextValue}>
             {children}
         </ReaderContext.Provider>
-    )
-
+    );
 };
