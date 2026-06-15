@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
-import PDFReader from './PDFReader';
+import PageReader from './PageReader';
 import LibraryHome from './LibraryHome';
 import TractateView from './TractateView';
 
@@ -14,19 +14,16 @@ const RouteHandler = ({ initialProps, initialLanguage }) => {
     }, []);
 
     const rawProps = initialProps || {};
-    const { ref: initialRef, hebrew_title: initialHebrewTitle, ...rest } = rawProps;
+    const { ref: initialRef, ...rest } = rawProps;
 
     return (
-        <>
-            <PDFReader
-                {...rest}
-                initialRef={initialRef}
-                initialHebrewTitle={initialHebrewTitle}
-                routeParams={params}
-                pathname={location.pathname}
-                initialLanguage={initialLanguage}
-            />
-        </>
+        <PageReader
+            {...rest}
+            initialRef={initialRef}
+            routeParams={params}
+            pathname={location.pathname}
+            initialLanguage={initialLanguage}
+        />
     );
 };
 

@@ -149,8 +149,8 @@ const ReaderRefsPanel = () => {
                         </a>
                     </div>
                 ) : (
-                    <div className="pdf-loading">
-                        <div className="pdf-spinner refs-spinner" />
+                    <div className="page-loading">
+                        <div className="page-spinner refs-spinner" />
                     </div>
                 )}
 

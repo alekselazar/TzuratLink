@@ -8,7 +8,7 @@ const express = require('express');
 const React = require('react');
 const ReactDOMServer = require('react-dom/server');
 const ReaderApp = require('./components/ReaderApp').default;
-const PDFReader = require('./components/PDFReader').default;
+const PageReader = require('./components/PageReader').default;
 
 const app = express();
 const PORT = 3000;
@@ -22,8 +22,8 @@ app.post('/render', (req, res) => {
         const { component, props } = req.body;
         
         let AppComponent;
-        if (component === 'PDFReader') {
-            AppComponent = PDFReader;
+        if (component === 'PageReader') {
+            AppComponent = PageReader;
         } else {
             AppComponent = ReaderApp;
         }

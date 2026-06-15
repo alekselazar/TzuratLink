@@ -47,7 +47,7 @@ const LibraryHome = ({ lang = 'he' }) => {
                     <p className="library-subheading">Babylonian Talmud</p>
                 </div>
                 {loading ? (
-                    <div className="pdf-loading"><div className="pdf-spinner" /></div>
+                    <div className="page-loading"><div className="page-spinner" /></div>
                 ) : (
                     <>
                         <Bookshelf tractates={ALL_TRACTATES.slice(0, MID)} available={available} navigate={navigate} />

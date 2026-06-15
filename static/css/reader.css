@@ -28,7 +28,7 @@ body {
     flex-direction: column;
 }
 
-.pdf-loading {
+.page-loading {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -37,7 +37,7 @@ body {
     min-height: 120px;
 }
 
-.pdf-spinner {
+.page-spinner {
     width: 40px;
     height: 40px;
     border: 4px solid #e0e0e0;
@@ -90,60 +90,32 @@ header {
     background-color: #18345d;
 }
 
-.pdf-reader {
+.page-reader {
     display: flex;
     width: 100%;
     flex: 1;
     overflow: hidden;
 }
 
-.reader-page-container {
+.page-content {
     position: relative;
-    display: inline-block;
     max-width: 100%;
     margin: 10px 20px;
 }
 
-.reader-page-image {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    vertical-align: top;
-}
-
-.reader-page-container .boxes-layer,
-.reader-page-container .highlighted-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
-
-.reader-page-container .boxes-layer {
-    pointer-events: auto;
-}
-
-.reader-page-container .box {
-    pointer-events: auto;
-}
-
-.highlighted-box, .hover-box {
-    background-color: var(--talmud);
-    border: 1px solid var(--talmud);
-    box-sizing: border-box;
-    opacity: 0.2;
-    position: absolute;
-}
-
-.box {
-    position: absolute;
+.segment {
+    cursor: pointer;
     transition: opacity .1s;
 }
 
-.boxes-layer {
-    z-index: 2;
+.segment--selected {
+    background-color: var(--talmud);
+    opacity: 0.2;
+}
+
+.segment--hovered {
+    background-color: var(--talmud);
+    opacity: 0.2;
 }
 
 .accordion {

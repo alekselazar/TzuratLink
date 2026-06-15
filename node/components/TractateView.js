@@ -62,8 +62,8 @@ const TractateView = () => {
             </div>
 
             {loading ? (
-                <div className="pdf-loading">
-                    <div className="pdf-spinner" />
+                <div className="page-loading">
+                    <div className="page-spinner" />
                 </div>
             ) : amudim.length === 0 ? (
                 <div className="tractate-wip">

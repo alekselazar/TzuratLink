@@ -7,7 +7,7 @@ export const useReaderState = (selector) => {
     return selector(context);
 };
 
-export const ReaderStateProvider = ({ pageRef, pageId, pdfUrl, boxes, anchors, initialLanguage, children }) => {
+export const ReaderStateProvider = ({ pageRef, pageId, blocks, initialLanguage, children }) => {
     const idRef = useRef(pageId);
 
     const lang = useRef(
@@ -16,19 +16,18 @@ export const ReaderStateProvider = ({ pageRef, pageId, pdfUrl, boxes, anchors, i
             : (typeof window !== 'undefined' ? navigator.language : 'he')
     );
 
-    const [sefariaRef, setSefariaRef] = useState(() => boxes?.[0]?.ref || '');
-    const [highlightedBoxes, setHighlightedBoxes] = useState([]);
-    const [existingBoxes, setExistingBoxes] = useState(boxes);
+    const [sefariaRef, setSefariaRef] = useState(
+        () => blocks?.[0]?.lines?.[0]?.segments?.[0]?.sefaria_ref || ''
+    );
 
     const contextValue = useMemo(() => ({
         pageRef,
-        sefariaRef, setSefariaRef,
-        highlightedBoxes, setHighlightedBoxes,
-        existingBoxes, setExistingBoxes,
         idRef,
         lang,
-        pdfUrl,
-    }), [pageRef, sefariaRef, highlightedBoxes, existingBoxes, pdfUrl]);
+        blocks,
+        sefariaRef,
+        setSefariaRef,
+    }), [pageRef, blocks, sefariaRef]);
 
     return (
         <ReaderContext.Provider value={contextValue}>
