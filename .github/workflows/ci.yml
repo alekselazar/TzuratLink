@@ -80,10 +80,10 @@ jobs:
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: node/package-lock.json
+          cache-dependency-path: node/package.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run tests
         run: npm test -- --ci --coverage
