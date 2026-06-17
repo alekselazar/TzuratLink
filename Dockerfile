@@ -3,7 +3,7 @@ FROM node:20-alpine AS bundle-builder
 WORKDIR /project
 
 # Install deps first (better layer caching)
-COPY node/package.json node/package-lock.json ./node/
+COPY node/package.json ./node/
 RUN cd node && npm install
 
 # Copy source so webpack can resolve relative paths correctly
