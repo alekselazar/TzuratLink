@@ -1,5 +1,7 @@
-# TzuratLink – Docker deployment: Nginx (gateway + load balancer), Django, Redis.
-# Mongo: use MongoDB Atlas (set MONGODB_* in .env). No mongo container.
+# TzuratLink – Docker deployment: Nginx, Django (Gunicorn), Redis.
+# MongoDB: Atlas (set MONGODB_* in .env). No mongo container.
+# DJANGO_IMAGE: set in .env on the server to pull a pre-built image from GHCR.
+#               Leave unset locally to build from source with `docker compose build`.
 
 services:
   nginx:
@@ -21,7 +23,7 @@ services:
 
   django:
     build: .
-    image: tzuratlink-django
+    image: ${DJANGO_IMAGE:-tzuratlink-django}
     container_name: tzuratlink-django
     restart: unless-stopped
     environment:
@@ -35,8 +37,13 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - STATIC_ROOT=/static
       - SECURE_SSL_REDIRECT=${SECURE_SSL_REDIRECT:-false}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GDRIVE_BACKUP_FOLDER_ID=${GDRIVE_BACKUP_FOLDER_ID}
+      - GDRIVE_CREDENTIALS=/run/secrets/gdrive-key.json
     volumes:
       - static_files:/static
+      - ./gdrive-key.json:/run/secrets/gdrive-key.json:ro
     depends_on:
       redis: { condition: service_healthy }
     healthcheck:

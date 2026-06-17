@@ -1,0 +1,150 @@
+import os
+from pathlib import Path
+from urllib.parse import quote_plus
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load .env from project root so env vars are available for settings below
+from dotenv import load_dotenv
+load_dotenv(BASE_DIR / ".env")
+
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "change-me-in-production-use-a-long-random-string"
+)
+DEBUG = os.environ.get("DJANGO_DEBUG", "false").lower() in ("1", "true", "yes")
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+
+INSTALLED_APPS = [
+    "core.apps.CoreConfig",
+    "reader.apps.ReaderConfig",
+    "accounts.apps.AccountsConfig",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+]
+
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
+]
+
+ROOT_URLCONF = "tzuratlink.urls"
+WSGI_APPLICATION = "tzuratlink.wsgi.application"
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
+
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
+
+# MongoDB (MongoEngine) – used by core app (Atlas: user/pass from .env)
+MONGODB_NAME = os.environ.get("MONGODB_NAME", "tzuratlink")
+_mongo_host = os.environ.get("MONGODB_HOST", "localhost:27017")
+_mongo_user = os.environ.get("MONGODB_USER", "")
+_mongo_pass = os.environ.get("MONGODB_PASSWORD", "")
+if _mongo_user and _mongo_pass:
+    _mongo_user_esc = quote_plus(_mongo_user)
+    _mongo_pass_esc = quote_plus(_mongo_pass)
+    MONGODB_HOST = f"mongodb+srv://{_mongo_user_esc}:{_mongo_pass_esc}@{_mongo_host}"
+else:
+    MONGODB_HOST = f"mongodb://{_mongo_host}"
+
+# Redis cache
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
+USE_I18N = True
+USE_TZ = True
+
+STATIC_URL = "static/"
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = os.environ.get("STATIC_ROOT", str(BASE_DIR / "staticfiles"))
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Sessions via Redis
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
+# django-allauth
+SITE_ID = 1
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "/"
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": os.environ.get("GOOGLE_CLIENT_ID", ""),
+            "secret": os.environ.get("GOOGLE_CLIENT_SECRET", ""),
+            "key": "",
+        },
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+        "OAUTH_PKCE_ENABLED": True,
+    }
+}
+
+# Production security (recommended when DEBUG=False)
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = "DENY"
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    # Set to True when Nginx (or another proxy) terminates HTTPS
+    SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "false").lower() in ("1", "true", "yes")
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

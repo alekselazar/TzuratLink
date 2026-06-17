@@ -1,0 +1,9 @@
+{
+  "watch": ["components", "server.js"],
+  "ext": "js,jsx",
+  "ignore": ["node_modules", "static", "webpack"],
+  "exec": "node server.js",
+  "env": {
+    "NODE_ENV": "development"
+  }
+}
