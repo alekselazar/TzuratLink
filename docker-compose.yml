@@ -35,8 +35,13 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - STATIC_ROOT=/static
       - SECURE_SSL_REDIRECT=${SECURE_SSL_REDIRECT:-false}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GDRIVE_BACKUP_FOLDER_ID=${GDRIVE_BACKUP_FOLDER_ID}
+      - GDRIVE_CREDENTIALS=/run/secrets/gdrive-key.json
     volumes:
       - static_files:/static
+      - ./gdrive-key.json:/run/secrets/gdrive-key.json:ro
     depends_on:
       redis: { condition: service_healthy }
     healthcheck:

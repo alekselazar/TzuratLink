@@ -19,17 +19,16 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY manage.py ./
 COPY core/ ./core/
 COPY reader/ ./reader/
+COPY accounts/ ./accounts/
 COPY templates/ ./templates/
 COPY static/ ./static/
 COPY tzuratlink/ ./tzuratlink/
 
 # Overwrite any stale committed bundle with the freshly compiled one
 COPY --from=bundle-builder /project/static/js/bundle.js ./static/js/bundle.js
-
-RUN python -c "open('manage.py','w').write('''#!/usr/bin/env python\nimport os,sys\nif __name__==\"__main__\":\n  os.environ.setdefault(\"DJANGO_SETTINGS_MODULE\",\"tzuratlink.settings\")\n  from django.core.management import execute_from_command_line\n  execute_from_command_line(sys.argv)\n''')"
-RUN test -f tzuratlink/settings.py || cp tzuratlink/settings.example.py tzuratlink/settings.py
 
 EXPOSE 8000
 CMD ["sh", "-c", "cp -r /app/static/. /static/ 2>/dev/null || true && python manage.py migrate --noinput && python manage.py collectstatic --noinput && exec gunicorn tzuratlink.wsgi:application --bind 0.0.0.0:8000 --workers 2"]
