@@ -20,10 +20,6 @@ venv/
 *.egg-info/
 .pytest_cache/
 
-# ── Nginx local overrides ────────────────────────────────────
-nginx/*.local.conf
-nginx/ssl/
-
 # ── Editor / OS ───────────────────────────────────────────────
 .DS_Store
 *.swp
