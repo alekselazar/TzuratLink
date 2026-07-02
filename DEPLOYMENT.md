@@ -60,20 +60,18 @@ node server.js
 
 By default it listens on port 3000. Set `SSR_SERVICE_URL` in Django to match (e.g. `http://127.0.0.1:3000` if Django and Node run on the same host).
 
-## 4. Docker deployment (Nginx + Django + SSR + Redis; Mongo = Atlas)
+## 4. Docker deployment (Django + Redis; Mongo = Atlas)
 
-The stack runs in Docker with **Nginx as gateway and load balancer**. MongoDB is **Atlas** (no mongo container).
+The stack runs in Docker with Django and Redis. MongoDB is **Atlas** (no mongo container). A reverse proxy (Nginx or otherwise) is **not part of this stack** — it's managed outside the repo, in front of Django's exposed port.
 
 ### What runs in Docker
 
-- **nginx** – Listens on 80, proxies to Django, serves `/static/` from a shared volume. Upstream is configurable for multiple Django replicas (load balancing).
-- **django** – Gunicorn; uses Atlas (env), Redis, and the SSR service.
-- **ssr** – Node.js React SSR server (used only by Django).
+- **django** – Gunicorn, exposed on host port 8000; uses Atlas (env), Redis, and the SSR service.
 - **redis** – Cache.
 
-### Run locally (test the full stack + Nginx)
+### Run locally (test the stack)
 
-Use this to check that Nginx, Django, SSR, and Redis work together before deploying. **HTTP only** (no HTTPS); the repo’s default `nginx/nginx.conf` is used.
+Use this to check that Django and Redis work together before deploying.
 
 1. **Create `.env`** in the project root (copy from `.env.example`). For a quick local test set at least:
    - `DJANGO_SECRET_KEY=local-test-secret-key-at-least-50-chars-long`
@@ -87,14 +85,13 @@ Use this to check that Nginx, Django, SSR, and Redis work together before deploy
 docker compose up -d --build
 ```
 
-3. **Open in browser:** [http://localhost](http://localhost)
+3. **Open in browser:** [http://localhost:8000](http://localhost:8000)
 
-   You should see the app. Nginx (port 80) is proxying to Django; static files are served by Nginx from the shared volume. To confirm Nginx is in the path, check that the page loads and that `/static/` URLs (e.g. CSS) work.
+   You should see the app served directly by Django/Gunicorn.
 
 4. **Logs if something fails:**
 
 ```bash
-docker compose logs -f nginx
 docker compose logs -f django
 docker compose logs -f ssr
 ```
@@ -105,13 +102,11 @@ docker compose logs -f ssr
 docker compose down
 ```
 
-**Nginx config used locally:** `nginx/nginx.conf` (HTTP, port 80). For HTTPS in production you switch to `nginx/nginx-https.conf` and mount certs; see **nginx/README.md**.
-
-**If `/static/` returns 404 (e.g. "No such file or directory" for `reader.css`):** The static volume is empty—often because Django failed before `collectstatic` on first run (e.g. DB or import error). Fix: run collectstatic to fill the volume, then restart nginx:
+**If static files 404 (e.g. "No such file or directory" for `reader.css`):** The static volume is empty—often because Django failed before `collectstatic` on first run (e.g. DB or import error). Fix: run collectstatic to fill the volume, then restart Django:
 
 ```bash
 docker compose run --rm django python manage.py collectstatic --noinput
-docker compose restart nginx
+docker compose restart django
 ```
 
 Or remove the static volume and bring the stack up again so Django runs collectstatic on start:
@@ -122,8 +117,6 @@ docker volume rm tzuratlink_static_files
 docker compose up -d
 ```
 
-Nginx is set to start only after Django is healthy, so on a clean start the volume should be populated.
-
 ### Deploy (production)
 
 1. In `.env` set at least: `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, `MONGODB_HOST`, `MONGODB_USER`, `MONGODB_PASSWORD` (Atlas). Optionally `MONGODB_NAME`, `DJANGO_DEBUG`, `SECURE_SSL_REDIRECT`.
@@ -133,7 +126,7 @@ Nginx is set to start only after Django is healthy, so on a clean start the volu
 docker compose up -d --build
 ```
 
-3. Open `http://localhost` (or your host). Nginx fronts the app; Django and SSR are not exposed directly.
+3. Django listens on host port 8000. Point your externally-managed reverse proxy at it; Django and SSR are not otherwise exposed directly to the internet.
 
 ### Deploy on Hostinger (VPS)
 
@@ -171,23 +164,22 @@ You need a **Hostinger VPS** (not shared hosting). Shared hosting cannot run Doc
 6. **Point your domain to the VPS**  
    In Hostinger (hPanel): Domains → your domain → DNS / Nameservers. Add an **A record** pointing to your VPS IP (or use the VPS’s default DNS if Hostinger set it).
 
-7. **HTTPS (recommended)**  
-   - **Option A:** In Hostinger hPanel, use **SSL** (e.g. Let’s Encrypt) for the domain. If the panel only issues certs for shared hosting, use Option B.  
-   - **Option B:** On the VPS, install certbot and issue a certificate for Nginx, then add an HTTPS server block in `nginx/nginx.conf` and set `SECURE_SSL_REDIRECT=true` in `.env`. Reload Nginx after changing the config.
+7. **Reverse proxy + HTTPS (recommended)**  
+   Set up a reverse proxy in front of Django (managed outside this repo — e.g. a host-level Nginx, Caddy, or Hostinger's own proxy) that forwards to `127.0.0.1:8000` and terminates HTTPS. Once HTTPS is in place, set `SECURE_SSL_REDIRECT=true` in `.env`.
 
-8. **Open the site** at `http://YOUR_VPS_IP` or `http://yourdomain.com`. After SSL, use `https://yourdomain.com`.
+8. **Open the site** at `http://YOUR_VPS_IP:8000` or through your reverse proxy at `http://yourdomain.com`. After SSL, use `https://yourdomain.com`.
 
 **Note:** Hostinger’s **Docker Manager** (in the VPS dashboard) can run Compose from a Git URL; you can point it at your repo and add the same env vars, then deploy. The steps above use the command line for full control.
 
 ### Load balancing
 
-To run multiple Django replicas, scale and point Nginx at them:
+To run multiple Django replicas, scale them and point your externally-managed reverse proxy at each instance's published port:
 
 ```bash
 docker compose up -d --scale django=2
 ```
 
-Then in `nginx/nginx.conf`, add a second `server` line in the `upstream backend` block (e.g. `server django_2:8000;` or use the service name if your Compose/Swarm setup resolves it to multiple backends). Reload nginx config if needed.
+Note that `docker-compose.yml` maps a fixed host port (`8000:8000`) for Django, so scaling beyond one replica requires either removing the fixed host port mapping or assigning replicas distinct ports before an external proxy can load-balance across them.
 
 ### MongoDB Atlas
 
@@ -204,7 +196,7 @@ For non-Docker runs, Django and the Node SSR server run on the host; see section
 
 ## 6. Reverse proxy (recommended)
 
-Put Gunicorn behind nginx (or another reverse proxy):
+Put Gunicorn behind a reverse proxy managed outside this repo (Nginx, Caddy, or your host's built-in proxy):
 
 - Proxy HTTP to `127.0.0.1:8000` (Gunicorn).
 - Serve `/static/` from `STATIC_ROOT` (after `collectstatic`).
@@ -214,12 +206,12 @@ The Node SSR server is only used by Django internally; it does not need to be ex
 
 ## 7. Production readiness
 
-**In place:** Settings from env (no secrets in code), DEBUG default false, security headers when DEBUG=False, Docker stack with Nginx, Atlas for Mongo, Redis, static via Nginx, healthchecks, restart policies.
+**In place:** Settings from env (no secrets in code), DEBUG default false, security headers when DEBUG=False, Docker stack for Django + Redis, Atlas for Mongo, healthchecks, restart policies.
 
 **Before go-live:**
 
 1. **`.env`** – Set `DJANGO_SECRET_KEY` (random, 50+ chars), `DJANGO_ALLOWED_HOSTS` to your real host(s) (e.g. `yourdomain.com`), and Atlas `MONGODB_HOST` / `MONGODB_USER` / `MONGODB_PASSWORD`. Do not use the default `SECRET_KEY` from settings.example.
-2. **HTTPS** – Use `nginx/nginx-https.conf`, mount SSL certs, expose 443, and set `SECURE_SSL_REDIRECT=true`. Step-by-step: **nginx/README.md** (certbot, mount certs, reload).
+2. **HTTPS** – Set up your externally-managed reverse proxy with SSL certs (e.g. certbot) in front of `127.0.0.1:8000`, then set `SECURE_SSL_REDIRECT=true`.
 3. **Optional** – Add tests; pin exact dependency versions if not already; consider rate limiting and logging.
 
 ## 8. Checklist
@@ -227,5 +219,5 @@ The Node SSR server is only used by Django internally; it does not need to be ex
 - [ ] `settings.py` from `settings.example.py`, all secrets from environment
 - [ ] `DJANGO_DEBUG=false`, `DJANGO_SECRET_KEY` and `DJANGO_ALLOWED_HOSTS` set for production
 - [ ] Docker: `docker compose up -d --build`; Atlas vars in `.env`
-- [ ] HTTPS in front of Nginx (or plan for it)
-- [ ] Static files served (Nginx in Docker handles this)
+- [ ] Reverse proxy + HTTPS in front of Django (managed outside this repo)
+- [ ] Static files served (via the reverse proxy or Django, depending on your setup)

@@ -13,7 +13,3 @@ settings.py
 __init__.py
 manage.py
 fix.py
-
-# Optional local nginx overrides (default nginx.conf / nginx-https.conf stay in repo)
-nginx/*.local.conf
-nginx/ssl/
