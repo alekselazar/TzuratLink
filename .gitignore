@@ -1,26 +1,19 @@
-# ── Secrets ──────────────────────────────────────────────────
-.env
-gdrive-key.json
-
-# ── Python ───────────────────────────────────────────────────
-__pycache__/
-*.pyc
-*.pyo
-
-# ── Databases ────────────────────────────────────────────────
-*.sqlite3
-
-# ── Node build output (webpack emits here) ───────────────────
 node_modules/
-static/js/
+webpack/
+__pycache__/
+migrations/
+js/
 
-# ── Python virtualenvs / packaging ───────────────────────────
-.venv/
-venv/
-*.egg-info/
-.pytest_cache/
+.env
+*.sqlite3
+settings.py
+.babelrc
+*.json
+settings.py
+__init__.py
+manage.py
+fix.py
 
-# ── Editor / OS ───────────────────────────────────────────────
-.DS_Store
-*.swp
-Thumbs.db
+# Optional local nginx overrides (default nginx.conf / nginx-https.conf stay in repo)
+nginx/*.local.conf
+nginx/ssl/

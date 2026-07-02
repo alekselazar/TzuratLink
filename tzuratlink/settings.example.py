@@ -81,26 +81,17 @@ if _mongo_user and _mongo_pass:
 else:
     MONGODB_HOST = f"mongodb://{_mongo_host}"
 
-REDIS_URL = os.environ.get("REDIS_URL", "")
-if REDIS_URL:
-    CACHES = {
-        "default": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": REDIS_URL,
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            },
-        }
+# Redis cache
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
     }
-    SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-    SESSION_CACHE_ALIAS = "default"
-else:
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-        }
-    }
-    SESSION_ENGINE = "django.contrib.sessions.backends.db"
+}
 
 # Node.js SSR service (for React server-side rendering)
 SSR_SERVICE_URL = os.environ.get("SSR_SERVICE_URL", "http://localhost:3000").rstrip("/")
@@ -126,6 +117,6 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    # Set to True when a reverse proxy terminates HTTPS
+    # Set to True when Nginx (or another proxy) terminates HTTPS
     SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "false").lower() in ("1", "true", "yes")
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
