@@ -19,6 +19,9 @@ SECRET_KEY = os.environ.get(
 DEBUG = os.environ.get("DJANGO_DEBUG", "false").lower() in ("1", "true", "yes")
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
+# Public base URL used for canonical links and structured data (reader/views.py)
+SITE_URL = os.environ.get("SITE_URL", "http://localhost:8000")
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -109,9 +112,6 @@ else:
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         }
     }
-
-# Node.js SSR service (for React server-side rendering)
-SSR_SERVICE_URL = os.environ.get("SSR_SERVICE_URL", "http://localhost:3000").rstrip("/")
 
 # django-allauth (Google OAuth social login; see accounts app)
 SITE_ID = 1

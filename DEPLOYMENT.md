@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Python 3.10+
-- Node.js 18+ (for SSR)
+- Node.js 18+ (to build the webpack bundle; the app is client-rendered, no Node server runs at runtime)
 - MongoDB
 - Redis
 
@@ -19,12 +19,12 @@ Required environment variables:
 | `DJANGO_SECRET_KEY` | Long random string (e.g. `openssl rand -base64 50`) |
 | `DJANGO_DEBUG` | Set to `false` in production |
 | `DJANGO_ALLOWED_HOSTS` | Comma-separated hostnames (e.g. `tzuratlink.example.com`) |
+| `SITE_URL` | Public base URL, used for canonical links and structured data (e.g. `https://tzuratlink.example.com`) |
 | `MONGODB_NAME` | MongoDB database name |
 | `MONGODB_HOST` | Atlas cluster host (e.g. `cluster0.xxxxx.mongodb.net`) |
 | `MONGODB_USER` | Atlas database user (in .env, not in code) |
 | `MONGODB_PASSWORD` | Atlas database password (in .env, not in code) |
 | `REDIS_URL` | Redis URL (e.g. `redis://localhost:6379/0`) |
-| `SSR_SERVICE_URL` | Base URL of the Node SSR server (e.g. `http://127.0.0.1:3000`) |
 | `GOOGLE_CLIENT_ID` | OAuth 2.0 client ID for Google sign-in (Google Cloud Console → Credentials) |
 | `GOOGLE_CLIENT_SECRET` | OAuth 2.0 client secret for Google sign-in |
 | `GDRIVE_CREDENTIALS` | Path to a Google service-account JSON key, used to back up `db.sqlite3` to Drive |
@@ -52,25 +52,23 @@ gunicorn tzuratlink.wsgi:application --bind 0.0.0.0:8000
 
 For local development you can use `python manage.py runserver` and skip Gunicorn.
 
-## 3. Node.js SSR server
-
-The React app is server-side rendered by a small Node server. It must be running for SSR; if it is down, the site falls back to client-side rendering.
+The React app itself is client-rendered — it needs a one-time webpack build, not a running Node server:
 
 ```bash
 cd node
 npm install
-node server.js
+npm run build
 ```
 
-By default it listens on port 3000. Set `SSR_SERVICE_URL` in Django to match (e.g. `http://127.0.0.1:3000` if Django and Node run on the same host).
+This outputs `static/js/bundle.js`, which `templates/reader.html` loads directly. Re-run this whenever `node/` source changes; the Dockerfile does it automatically as part of the image build.
 
-## 4. Docker deployment (Django + Redis; Mongo = Atlas)
+## 3. Docker deployment (Django + Redis; Mongo = Atlas)
 
 The stack runs in Docker with Django and Redis. MongoDB is **Atlas** (no mongo container). A reverse proxy (Nginx or otherwise) is **not part of this stack** — it's managed outside the repo, in front of Django's exposed port.
 
 ### What runs in Docker
 
-- **django** – Gunicorn, exposed on host port 8000; uses Atlas (env), Redis, and the SSR service.
+- **django** – Gunicorn, exposed on host port 8000; uses Atlas (env) and Redis. Serves the client-rendered React app (webpack bundle compiled at image build time).
 - **redis** – Cache.
 
 ### Run locally (test the stack)
@@ -97,7 +95,6 @@ docker compose up -d --build
 
 ```bash
 docker compose logs -f django
-docker compose logs -f ssr
 ```
 
 5. **Stop:**
@@ -123,14 +120,14 @@ docker compose up -d
 
 ### Deploy (production)
 
-1. In `.env` set at least: `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, `MONGODB_HOST`, `MONGODB_USER`, `MONGODB_PASSWORD` (Atlas). Optionally `MONGODB_NAME`, `DJANGO_DEBUG`, `SECURE_SSL_REDIRECT`.
+1. In `.env` set at least: `DJANGO_SECRET_KEY`, `DJANGO_ALLOWED_HOSTS`, `SITE_URL` (your real domain — used for canonical links and structured data), `MONGODB_HOST`, `MONGODB_USER`, `MONGODB_PASSWORD` (Atlas). Optionally `MONGODB_NAME`, `DJANGO_DEBUG`, `SECURE_SSL_REDIRECT`.
 2. Build and start:
 
 ```bash
 docker compose up -d --build
 ```
 
-3. Django listens on host port 8000. Point your externally-managed reverse proxy at it; Django and SSR are not otherwise exposed directly to the internet.
+3. Django listens on host port 8000. Point your externally-managed reverse proxy at it; Django is not otherwise exposed directly to the internet.
 
 ### Deploy on Hostinger (VPS)
 
@@ -194,11 +191,11 @@ Mongo is **not** in Docker; use **MongoDB Atlas**. Set in `.env`:
 - `MONGODB_USER` – Atlas user
 - `MONGODB_PASSWORD` – Atlas password
 
-## 5. Other services
+## 4. Other services
 
-For non-Docker runs, Django and the Node SSR server run on the host; see sections 2 and 3.
+For non-Docker runs, Django runs on the host; see section 2 (the webpack bundle just needs to be built once beforehand).
 
-## 6. Reverse proxy (recommended)
+## 5. Reverse proxy (recommended)
 
 Put Gunicorn behind a reverse proxy managed outside this repo (Nginx, Caddy, or your host's built-in proxy):
 
@@ -206,19 +203,17 @@ Put Gunicorn behind a reverse proxy managed outside this repo (Nginx, Caddy, or 
 - Serve `/static/` from `STATIC_ROOT` (after `collectstatic`).
 - Optionally enable HTTPS and set `SECURE_SSL_REDIRECT=true` and other security headers (see `settings.example.py`).
 
-The Node SSR server is only used by Django internally; it does not need to be exposed to the internet.
-
-## 7. Production readiness
+## 6. Production readiness
 
 **In place:** Settings from env (no secrets in code), DEBUG default false, security headers when DEBUG=False, Docker stack for Django + Redis, Atlas for Mongo, healthchecks, restart policies.
 
 **Before go-live:**
 
-1. **`.env`** – Set `DJANGO_SECRET_KEY` (random, 50+ chars), `DJANGO_ALLOWED_HOSTS` to your real host(s) (e.g. `yourdomain.com`), and Atlas `MONGODB_HOST` / `MONGODB_USER` / `MONGODB_PASSWORD`. Do not use the default `SECRET_KEY` from settings.example.
+1. **`.env`** – Set `DJANGO_SECRET_KEY` (random, 50+ chars), `DJANGO_ALLOWED_HOSTS` and `SITE_URL` to your real host(s) (e.g. `yourdomain.com`), and Atlas `MONGODB_HOST` / `MONGODB_USER` / `MONGODB_PASSWORD`. Do not use the default `SECRET_KEY` from settings.example.
 2. **HTTPS** – Set up your externally-managed reverse proxy with SSL certs (e.g. certbot) in front of `127.0.0.1:8000`, then set `SECURE_SSL_REDIRECT=true`.
 3. **Optional** – Add tests; pin exact dependency versions if not already; consider rate limiting and logging.
 
-## 8. Checklist
+## 7. Checklist
 
 - [ ] `settings.py` from `settings.example.py`, all secrets from environment
 - [ ] `DJANGO_DEBUG=false`, `DJANGO_SECRET_KEY` and `DJANGO_ALLOWED_HOSTS` set for production

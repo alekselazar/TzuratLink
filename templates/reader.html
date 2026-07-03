@@ -1,10 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ lang }}" dir="{{ direction }}">
 {% load static %}
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token }}" />
-    <title>TzuratLink {% block title %}{% endblock %}</title>
+    <title>{{ page_title }}</title>
+    <meta name="description" content="{{ page_description }}" />
+    <link rel="canonical" href="{{ canonical_url }}" />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="{{ page_title }}" />
+    <meta property="og:description" content="{{ page_description }}" />
+    <meta property="og:url" content="{{ canonical_url }}" />
+    {% if page_image %}<meta property="og:image" content="{{ page_image }}" />{% endif %}
+    <script type="application/ld+json">{{ structured_data|safe }}</script>
     <link rel="stylesheet" href="{% static 'css/reader.css' %}"/>
 </head>
 <body>
@@ -23,8 +32,16 @@
         {% endblock %}
     </nav>
     <div id="app">
-        {% block content %}
-        {% endblock  %}
+        {% if seo_text %}
+        <!-- Server-rendered fallback so search engines see real daf text even without JS.
+             Replaced by the interactive React reader once client.js mounts. -->
+        <article lang="he" dir="rtl">
+            <h2>{{ ref }}</h2>
+            {% for paragraph in seo_text %}
+            <p>{{ paragraph }}</p>
+            {% endfor %}
+        </article>
+        {% endif %}
     </div>
     <script src="{% static 'js/bundle.js' %}"></script>
 </body>

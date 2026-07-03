@@ -3,15 +3,10 @@ import React from 'react';
 import ReaderApp from './components/ReaderApp';
 
 const appElement = document.getElementById('app');
-const hasSSR = appElement.children.length > 0 && !appElement.querySelector('h1');
-
 const app = React.createElement(ReaderApp, { component: djangoComponent, props: djangoProps });
 
-if (hasSSR) {
-    // Hydrate existing SSR HTML
-    const root = ReactDOM.hydrateRoot(appElement, app);
-} else {
-    // Client-side render (CSR)
-    const root = ReactDOM.createRoot(appElement);
-    root.render(app);
-}
+// Clear the server-rendered SEO fallback markup (if any) before mounting, so React
+// takes over a clean container instead of reconciling against static HTML it didn't render.
+appElement.innerHTML = '';
+const root = ReactDOM.createRoot(appElement);
+root.render(app);

@@ -7,7 +7,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 
-from core.utils import get_for_sref
+from core.utils import get_for_sref, get_sefaria_seo_text
 
 
 def _lang(request):
@@ -73,6 +73,7 @@ def page_view(request, ref):
         return JsonResponse({'error': "Page not found"}, status=404)
     site_url = getattr(settings, 'SITE_URL', 'http://localhost:8000').rstrip('/')
     title = f"{ref} | TzuratLink"
+    seo_text = get_sefaria_seo_text(page_data.get('sefaria_ref') or ref)
     return render(request, 'reader.html', {
         'lang': lang,
         'direction': _dir(lang),
@@ -89,6 +90,7 @@ def page_view(request, ref):
             'url': f'{site_url}/page/{ref}',
         }),
         'ref': ref,
+        'seo_text': seo_text,
     })
 
 
