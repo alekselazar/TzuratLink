@@ -88,17 +88,27 @@ if _mongo_user and _mongo_pass:
 else:
     MONGODB_HOST = f"mongodb://{_mongo_host}"
 
-# Redis cache
-REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": REDIS_URL,
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
+# Redis cache — falls back to an in-memory cache when REDIS_URL isn't set (e.g. local
+# testing without a Redis container), and ignores connection errors at runtime so a
+# Redis outage degrades to no caching instead of breaking requests.
+REDIS_URL = os.environ.get("REDIS_URL", "")
+if REDIS_URL:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": REDIS_URL,
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "IGNORE_EXCEPTIONS": True,
+            },
+        }
     }
-}
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
 
 # Node.js SSR service (for React server-side rendering)
 SSR_SERVICE_URL = os.environ.get("SSR_SERVICE_URL", "http://localhost:3000").rstrip("/")

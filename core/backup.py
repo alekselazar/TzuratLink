@@ -68,7 +68,10 @@ def backup_db(dated=True):
 
 
 def backup_async(dated=True):
-    """Fire-and-forget: run backup_db in a background thread."""
+    """Fire-and-forget: run backup_db in a background thread. No-op if Drive is not configured."""
+    if not os.environ.get('GDRIVE_BACKUP_FOLDER_ID'):
+        return
+
     def run():
         try:
             backup_db(dated=dated)
