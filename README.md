@@ -4,7 +4,7 @@
 
 ## Introduction
 
-TzuratLink represents a groundbreaking endeavor to integrate the meticulous study of the Talmud with the vast digital resources available through [Sefaria](https://sefaria.org). This platform, currently in development, aims to leverage cutting-edge technology to enrich traditional Talmud study, making it more accessible and interactive. On this stage we developed Editor App for simple manual linking and now we are working on linking Talmud PDFs to Sefaria texts.
+TzuratLink represents a groundbreaking endeavor to integrate the meticulous study of the Talmud with the vast digital resources available through [Sefaria](https://sefaria.org). This platform, currently in development, aims to leverage cutting-edge technology to enrich traditional Talmud study, making it more accessible and interactive. Pages are stored as structured, word-level blocks (rather than page images), with segments linked to Sefaria references for click-to-view commentary.
 
 ## Project Goals
 
@@ -16,18 +16,11 @@ Our mission is to create a seamless bridge between the physical pages of the Tal
 
 ## Backend Architecture
 
-The Django-based backend of TzuratLink is designed to manage complex data structures, user interactions, and integrations with external APIs such as Sefaria.
-
-### Manual Linking Tool
-Manual linking tool is represented with ```EditorApp``` React component with django backend ```editor``` app. 
-After that we can manually select sentences on the page, linking them to relevant Sefaria references.
-
-### Translations
-We are using [OpenAI API](https://platform.openai.com/docs/overview) to generate and then edit translations to talmudic texts. It is part of Editor App.
+The Django-based backend of TzuratLink is designed to manage complex data structures, user interactions, and integrations with external APIs such as Sefaria. The frontend is a client-rendered React app (built with webpack, served as a static bundle); Google Drive backups and Google OAuth sign-in are also integrated.
 
 ## Deployment
 
-For production deployment (settings, environment variables, Gunicorn, Node SSR, and reverse proxy), see [DEPLOYMENT.md](DEPLOYMENT.md).
+For production deployment (settings, environment variables, Gunicorn, and reverse proxy), see [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Conclusion
 
