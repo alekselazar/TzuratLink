@@ -1,15 +1,16 @@
 node_modules/
-webpack/
 __pycache__/
 migrations/
-js/
+static/js/
+node/coverage/
 
 .env
 *.sqlite3
 settings.py
-.babelrc
-*.json
-settings.py
 __init__.py
 manage.py
 fix.py
+
+# npm lockfile intentionally not committed (see bc7605addd5976746744fe49332d266df01b9d6d) —
+# CI and Docker both use `npm install`, not `npm ci`
+node/package-lock.json
