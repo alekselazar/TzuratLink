@@ -114,43 +114,25 @@ jobs:
           tags: tzuratlink:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}
+            DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }}
+            DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}
+            SITE_URL=${{ secrets.SITE_URL }}
+            MONGODB_NAME=${{ secrets.MONGODB_NAME }}
+            MONGODB_HOST=${{ secrets.MONGODB_HOST }}
+            MONGODB_USER=${{ secrets.MONGODB_USER }}
+            MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }}
+            REDIS_URL=${{ secrets.REDIS_URL }}
+            SSR_SERVICE_URL=${{ secrets.SSR_SERVICE_URL }}
+            SECURE_SSL_REDIRECT=${{ secrets.SECURE_SSL_REDIRECT }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            GDRIVE_BACKUP_FOLDER_ID=${{ secrets.GDRIVE_BACKUP_FOLDER_ID }}
+            GDRIVE_CREDENTIALS=${{ secrets.GDRIVE_CREDENTIALS_JSON }}
 
       - name: Smoke test — verify the app actually boots inside the built image
-        env:
-          DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
-          DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
-          DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
-          SITE_URL: ${{ secrets.SITE_URL }}
-          MONGODB_NAME: ${{ secrets.MONGODB_NAME }}
-          MONGODB_HOST: ${{ secrets.MONGODB_HOST }}
-          MONGODB_USER: ${{ secrets.MONGODB_USER }}
-          MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
-          REDIS_URL: ${{ secrets.REDIS_URL }}
-          SSR_SERVICE_URL: ${{ secrets.SSR_SERVICE_URL }}
-          SECURE_SSL_REDIRECT: ${{ secrets.SECURE_SSL_REDIRECT }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          GDRIVE_BACKUP_FOLDER_ID: ${{ secrets.GDRIVE_BACKUP_FOLDER_ID }}
-          GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS_JSON }}
-        run: |
-          docker run --rm \
-            -e DJANGO_SECRET_KEY \
-            -e DJANGO_DEBUG \
-            -e DJANGO_ALLOWED_HOSTS \
-            -e SITE_URL \
-            -e MONGODB_NAME \
-            -e MONGODB_HOST \
-            -e MONGODB_USER \
-            -e MONGODB_PASSWORD \
-            -e REDIS_URL \
-            -e SSR_SERVICE_URL \
-            -e SECURE_SSL_REDIRECT \
-            -e GOOGLE_CLIENT_ID \
-            -e GOOGLE_CLIENT_SECRET \
-            -e GDRIVE_BACKUP_FOLDER_ID \
-            -e GDRIVE_CREDENTIALS \
-            tzuratlink:ci \
-            python manage.py check
+        run: docker run --rm tzuratlink:ci python manage.py check
 
       - name: Log in to GitHub Container Registry
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
