@@ -21,6 +21,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY core/ ./core/
 COPY reader/ ./reader/
+COPY accounts/ ./accounts/
 COPY templates/ ./templates/
 COPY static/ ./static/
 COPY tzuratlink/ ./tzuratlink/

@@ -13,6 +13,7 @@ services:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - DJANGO_DEBUG=${DJANGO_DEBUG:-false}
       - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      - SITE_URL=${SITE_URL:-http://localhost:8000}
       - MONGODB_NAME=${MONGODB_NAME:-tzuratlink}
       - MONGODB_HOST=${MONGODB_HOST}
       - MONGODB_USER=${MONGODB_USER}
@@ -20,6 +21,10 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - STATIC_ROOT=/static
       - SECURE_SSL_REDIRECT=${SECURE_SSL_REDIRECT:-false}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GDRIVE_CREDENTIALS=${GDRIVE_CREDENTIALS}
+      - GDRIVE_BACKUP_FOLDER_ID=${GDRIVE_BACKUP_FOLDER_ID}
     volumes:
       - static_files:/static
     depends_on:

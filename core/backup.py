@@ -1,5 +1,6 @@
 import os
 import datetime
+import json
 import logging
 import threading
 from pathlib import Path
@@ -13,11 +14,15 @@ def _drive_service():
     from googleapiclient.discovery import build
     from google.oauth2 import service_account
 
-    creds_path = Path(os.environ.get('GDRIVE_CREDENTIALS', ''))
-    if not creds_path.exists():
-        raise FileNotFoundError(f'GDRIVE_CREDENTIALS not found: {creds_path}')
-    creds = service_account.Credentials.from_service_account_file(
-        str(creds_path),
+    creds_json = os.environ.get('GDRIVE_CREDENTIALS', '')
+    if not creds_json:
+        raise EnvironmentError('GDRIVE_CREDENTIALS env var is not set.')
+    try:
+        creds_info = json.loads(creds_json)
+    except json.JSONDecodeError as e:
+        raise ValueError(f'GDRIVE_CREDENTIALS is not valid JSON: {e}') from e
+    creds = service_account.Credentials.from_service_account_info(
+        creds_info,
         scopes=['https://www.googleapis.com/auth/drive.file'],
     )
     return build('drive', 'v3', credentials=creds, cache_discovery=False)
