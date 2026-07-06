@@ -173,7 +173,8 @@ jobs:
       - name: Tag and push image
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
-          for tag in ${{ steps.meta.outputs.tags }}; do
+          while IFS= read -r tag; do
+            [ -n "$tag" ] || continue
             docker tag tzuratlink:ci "$tag"
             docker push "$tag"
-          done
+          done <<< "${{ steps.meta.outputs.tags }}"
