@@ -57,10 +57,18 @@ body {
 }
 
 header {
-    text-align: center;
     display: flex;
-    justify-content: center;
+    align-items: center;
+    position: relative;
     box-shadow: 0px 5px 5px -5px;
+    padding: 6px 20px;
+    box-sizing: border-box;
+}
+
+.header-brand {
+    display: flex;
+    text-align: center;
+    text-decoration: none;
 }
 
 #logo {
@@ -70,24 +78,201 @@ header {
 }
 
 #title {
-    font-family: monospace;
-    font-size: 30px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
     display: inline;
     color: #18345d;
 }
 
-#navigate:link, #navigate:active, #naigate:visited {
-    text-decoration: none;
-    padding: 14px 25px;
-    background-color: #fff;
-    color: #18345d;
+#main-nav {
+    position: absolute;
+    inset-inline-end: 20px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
-#navigate:hover {
-    text-decoration: none;
-    padding: 14px 25px;
+/* ── User nav (sign in / sign up / account) ─────────── */
+
+.user-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-nav__name {
+    color: #18345d;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.user-nav__btn {
+    background: none;
+    border: 1px solid #18345d;
+    color: #18345d;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.user-nav__btn:hover {
+    background: #18345d;
     color: #fff;
-    background-color: #18345d;
+}
+
+.user-nav__link {
+    text-decoration: none;
+    color: #18345d;
+    padding: 6px 14px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.user-nav__link:hover {
+    background: #f0ede2;
+}
+
+.user-nav__link--signup {
+    background: #18345d;
+    color: #fff;
+}
+
+.user-nav__link--signup:hover {
+    background: #0e2040;
+    color: #fff;
+}
+
+/* ── Auth pages (login / signup) ─────────────────────── */
+
+.auth-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100%;
+    padding: 40px 20px;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 360px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    padding: 32px 28px;
+    box-sizing: border-box;
+}
+
+.auth-title {
+    text-align: center;
+    color: #18345d;
+    margin: 0 0 24px;
+    font-size: 22px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: #18345d;
+}
+
+.auth-error {
+    color: #802f3e;
+    font-size: 13px;
+    margin: 0;
+}
+
+.auth-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #18345d;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+}
+
+.auth-btn:hover {
+    background: #0e2040;
+}
+
+.auth-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.auth-btn--google {
+    background: #fff;
+    color: #3c4043;
+    border: 1px solid #dadce0;
+}
+
+.auth-btn--google:hover {
+    background: #f7f7f7;
+}
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    color: #999;
+    font-size: 12px;
+    margin: 16px 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.auth-divider span {
+    padding: 0 10px;
+}
+
+.auth-footer {
+    text-align: center;
+    font-size: 13px;
+    color: #666;
+    margin: 16px 0 0;
+}
+
+.auth-link {
+    color: #18345d;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
 }
 
 .page-reader {
@@ -467,8 +652,8 @@ body.library-page #app {
 }
 
 .book-title-he {
-    writing-mode: vertical-rl;
-    font-size: 1.3vh;
+    writing-mode: sideways-lr;
+    font-size: 3vh;
     color: rgba(255,255,255,0.92);
     font-weight: 700;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);

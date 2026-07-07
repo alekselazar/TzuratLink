@@ -127,6 +127,11 @@ ACCOUNT_EMAIL_VERIFICATION = "optional"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 
+# Skip allauth's own (unstyled) intermediate confirmation page and redirect
+# straight to Google — the "Continue with Google" button already serves as
+# the user's confirmation to proceed.
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
 SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "APP": {

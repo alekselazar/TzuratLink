@@ -1,6 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Link, useParams, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './AuthContext';
 import PageReader from './PageReader';
 import LoginPage from './LoginPage';
@@ -8,9 +8,10 @@ import SignupPage from './SignupPage';
 import LibraryHome from './LibraryHome';
 import TractateView from './TractateView';
 
-const UserNav = () => {
+const UserNav = ({ lang }) => {
     const { user, loading, logout } = useAuth();
     const navigate = useNavigate();
+    const isHe = lang !== 'en';
 
     const target = typeof document !== 'undefined' ? document.getElementById('main-nav') : null;
     if (!target) return null;
@@ -24,12 +25,16 @@ const UserNav = () => {
         loading ? null : user ? (
             <div className="user-nav">
                 <span className="user-nav__name">{user.name || user.email}</span>
-                <button className="user-nav__btn" onClick={handleLogout}>Sign out</button>
+                <button className="user-nav__btn" onClick={handleLogout}>
+                    {isHe ? 'התנתקות' : 'Sign out'}
+                </button>
             </div>
         ) : (
             <div className="user-nav">
-                <a className="user-nav__link" href="/login">Sign in</a>
-                <a className="user-nav__link user-nav__link--signup" href="/signup">Sign up</a>
+                <Link className="user-nav__link" to="/login">{isHe ? 'התחברות' : 'Sign in'}</Link>
+                <Link className="user-nav__link user-nav__link--signup" to="/signup">
+                    {isHe ? 'הרשמה' : 'Sign up'}
+                </Link>
             </div>
         ),
         target
@@ -57,13 +62,13 @@ const ReaderApp = ({ props, initialLanguage }) => {
     return (
         <BrowserRouter>
             <AuthProvider>
-                <UserNav />
+                <UserNav lang={lang} />
                 <Routes>
                     <Route path="/" element={<LibraryHome lang={lang} />} />
                     <Route path="/tractate/:name" element={<TractateView />} />
                     <Route path="/page/:ref" element={<RouteHandler initialProps={props} initialLanguage={lang} />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/signup" element={<SignupPage />} />
+                    <Route path="/login" element={<LoginPage lang={lang} />} />
+                    <Route path="/signup" element={<SignupPage lang={lang} />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
             </AuthProvider>

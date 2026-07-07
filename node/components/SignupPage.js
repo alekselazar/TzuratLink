@@ -11,7 +11,7 @@ const GoogleIcon = () => (
     </svg>
 );
 
-const SignupPage = () => {
+const SignupPage = ({ lang }) => {
     const { signup } = useAuth();
     const navigate = useNavigate();
     const [name, setName] = useState('');
@@ -19,6 +19,7 @@ const SignupPage = () => {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const isHe = lang !== 'en';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -35,14 +36,14 @@ const SignupPage = () => {
     };
 
     return (
-        <div className="auth-page">
+        <div className="auth-page" dir={isHe ? 'rtl' : 'ltr'}>
             <div className="auth-card">
-                <h2 className="auth-title">Create account</h2>
+                <h2 className="auth-title">{isHe ? 'יצירת חשבון' : 'Create account'}</h2>
                 <form onSubmit={handleSubmit} className="auth-form">
                     <input
                         className="auth-input"
                         type="text"
-                        placeholder="Full name"
+                        placeholder={isHe ? 'שם מלא' : 'Full name'}
                         value={name}
                         onChange={e => setName(e.target.value)}
                         autoComplete="name"
@@ -50,7 +51,7 @@ const SignupPage = () => {
                     <input
                         className="auth-input"
                         type="email"
-                        placeholder="Email"
+                        placeholder={isHe ? 'אימייל' : 'Email'}
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         autoComplete="email"
@@ -59,7 +60,7 @@ const SignupPage = () => {
                     <input
                         className="auth-input"
                         type="password"
-                        placeholder="Password (min 8 characters)"
+                        placeholder={isHe ? 'סיסמה (לפחות 8 תווים)' : 'Password (min 8 characters)'}
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         autoComplete="new-password"
@@ -68,16 +69,16 @@ const SignupPage = () => {
                     />
                     {error && <p className="auth-error">{error}</p>}
                     <button className="auth-btn" type="submit" disabled={loading}>
-                        {loading ? 'Creating account…' : 'Create account'}
+                        {loading ? (isHe ? 'יוצר חשבון…' : 'Creating account…') : (isHe ? 'יצירת חשבון' : 'Create account')}
                     </button>
                 </form>
-                <div className="auth-divider"><span>or</span></div>
+                <div className="auth-divider"><span>{isHe ? 'או' : 'or'}</span></div>
                 <a className="auth-btn auth-btn--google" href="/accounts/google/login/">
-                    <GoogleIcon /> Continue with Google
+                    <GoogleIcon /> {isHe ? 'המשך עם Google' : 'Continue with Google'}
                 </a>
                 <p className="auth-footer">
-                    Already have an account?{' '}
-                    <Link className="auth-link" to="/login">Sign in</Link>
+                    {isHe ? 'כבר יש לך חשבון?' : 'Already have an account?'}{' '}
+                    <Link className="auth-link" to="/login">{isHe ? 'התחברות' : 'Sign in'}</Link>
                 </p>
             </div>
         </div>

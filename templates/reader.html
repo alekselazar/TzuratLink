@@ -22,15 +22,12 @@
         const djangoProps = JSON.parse('{{ props|escapejs }}');
     </script>
     <header>
-        <a href="/">
+        <a href="/" class="header-brand">
             <img id="logo" src="{% static "img/logo.png" %}" alt="Logo">
-            <h1 id="title">TzuratLink</h1>
+            <h1 id="title">{% if lang == "en" %}TzuratLink{% else %}צורתלינק{% endif %}</h1>
         </a>
+        <div id="main-nav"></div>
     </header>
-    <nav id="main-nav">
-        {% block navigate %}
-        {% endblock %}
-    </nav>
     <div id="app">
         {% if seo_text %}
         <!-- Server-rendered fallback so search engines see real daf text even without JS.

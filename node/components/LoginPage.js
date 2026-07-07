@@ -11,13 +11,14 @@ const GoogleIcon = () => (
     </svg>
 );
 
-const LoginPage = () => {
+const LoginPage = ({ lang }) => {
     const { login } = useAuth();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const isHe = lang !== 'en';
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -34,14 +35,14 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="auth-page">
+        <div className="auth-page" dir={isHe ? 'rtl' : 'ltr'}>
             <div className="auth-card">
-                <h2 className="auth-title">Sign in</h2>
+                <h2 className="auth-title">{isHe ? 'התחברות' : 'Sign in'}</h2>
                 <form onSubmit={handleSubmit} className="auth-form">
                     <input
                         className="auth-input"
                         type="email"
-                        placeholder="Email"
+                        placeholder={isHe ? 'אימייל' : 'Email'}
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         autoComplete="email"
@@ -50,7 +51,7 @@ const LoginPage = () => {
                     <input
                         className="auth-input"
                         type="password"
-                        placeholder="Password"
+                        placeholder={isHe ? 'סיסמה' : 'Password'}
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         autoComplete="current-password"
@@ -58,16 +59,16 @@ const LoginPage = () => {
                     />
                     {error && <p className="auth-error">{error}</p>}
                     <button className="auth-btn" type="submit" disabled={loading}>
-                        {loading ? 'Signing in…' : 'Sign in'}
+                        {loading ? (isHe ? 'מתחבר…' : 'Signing in…') : (isHe ? 'התחברות' : 'Sign in')}
                     </button>
                 </form>
-                <div className="auth-divider"><span>or</span></div>
+                <div className="auth-divider"><span>{isHe ? 'או' : 'or'}</span></div>
                 <a className="auth-btn auth-btn--google" href="/accounts/google/login/">
-                    <GoogleIcon /> Continue with Google
+                    <GoogleIcon /> {isHe ? 'המשך עם Google' : 'Continue with Google'}
                 </a>
                 <p className="auth-footer">
-                    Don't have an account?{' '}
-                    <Link className="auth-link" to="/signup">Sign up</Link>
+                    {isHe ? 'אין לך חשבון?' : "Don't have an account?"}{' '}
+                    <Link className="auth-link" to="/signup">{isHe ? 'הרשמה' : 'Sign up'}</Link>
                 </p>
             </div>
         </div>
