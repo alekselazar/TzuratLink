@@ -120,6 +120,9 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
+# Default adapter silently discards social-login errors (no-op, never logged) —
+# use ours instead so failures actually show up in logs.
+SOCIALACCOUNT_ADAPTER = "accounts.adapters.LoggingSocialAccountAdapter"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
