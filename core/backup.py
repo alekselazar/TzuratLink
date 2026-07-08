@@ -84,3 +84,52 @@ def backup_async(dated=True):
             logger.exception('DB backup to Google Drive failed')
 
     threading.Thread(target=run, daemon=True).start()
+
+
+def restore_db():
+    """
+    Download the latest DB backup from Google Drive into place, but only if
+    the local DB file doesn't already exist (never clobbers existing data).
+
+    Meant to run once at container startup, before migrate, so a fresh
+    instance (e.g. after a redeploy with no persistent volume) picks up
+    existing users/sessions instead of starting from an empty DB.
+
+    Returns True if a backup was restored, False otherwise (DB already
+    exists, Drive isn't configured, no backup found, or any failure) —
+    never raises, since a missing/failed restore should fall through to
+    migrate creating a fresh DB rather than blocking startup.
+    """
+    from django.conf import settings
+
+    folder_id = os.environ.get('GDRIVE_BACKUP_FOLDER_ID', '')
+    if not folder_id:
+        return False
+
+    db_path = Path(settings.DATABASES['default']['NAME'])
+    if db_path.exists():
+        return False
+
+    try:
+        from googleapiclient.http import MediaIoBaseDownload
+        import io
+
+        service = _drive_service()
+        file_id = _find_file(service, LATEST_NAME, folder_id)
+        if not file_id:
+            return False
+
+        request = service.files().get_media(fileId=file_id)
+        buf = io.BytesIO()
+        downloader = MediaIoBaseDownload(buf, request)
+        done = False
+        while not done:
+            _, done = downloader.next_chunk()
+
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+        db_path.write_bytes(buf.getvalue())
+        logger.info('Restored db.sqlite3 from Google Drive backup (%s)', LATEST_NAME)
+        return True
+    except Exception:
+        logger.exception('DB restore from Google Drive failed')
+        return False
