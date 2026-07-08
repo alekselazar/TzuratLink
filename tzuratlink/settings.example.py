@@ -156,6 +156,31 @@ STATIC_ROOT = os.environ.get("STATIC_ROOT", str(BASE_DIR / "staticfiles"))
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Ensure errors (e.g. from allauth's social-login pipeline, which catches its own
+# exceptions and doesn't always propagate them) actually reach stdout/stderr —
+# gunicorn doesn't log per-request by default, so without this, failures are
+# otherwise invisible in `kubectl logs`/`docker logs`.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
+
 # Production security (recommended when DEBUG=False)
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True

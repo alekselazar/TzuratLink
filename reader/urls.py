@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path('health/', views.health, name='health'),
+    path('health', views.health, name='health_noslash'),
     path('', views.homepage, name='homepage'),
     path('dafyomi/', views.dafyomi_redirect, name='dafyomi_redirect'),
     path('page/<path:ref>', views.page_view, name='page_view'),
