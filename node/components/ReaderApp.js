@@ -2,7 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { BrowserRouter, Routes, Route, Navigate, Link, useParams, useLocation, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './AuthContext';
-import PageReader from './PageReader';
+import PDFReader from './PDFReader';
 import LoginPage from './LoginPage';
 import SignupPage from './SignupPage';
 import LibraryHome from './LibraryHome';
@@ -48,7 +48,7 @@ const RouteHandler = ({ initialProps, initialLanguage }) => {
     const { ref: initialRef, ...rest } = rawProps;
 
     return (
-        <PageReader
+        <PDFReader
             {...rest}
             initialRef={initialRef}
             routeParams={params}

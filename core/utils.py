@@ -45,16 +45,29 @@ def get_for_sref(sefaria_ref):
         if not page:
             return None
 
+        boxes = []
+        for bbox in page.bboxes or []:
+            boxes.append({
+                "ref": bbox.ref,
+                "top": f"{float(bbox.top) * 100}%",
+                "left": f"{float(bbox.left) * 100}%",
+                "width": f"{float(bbox.width) * 100}%",
+                "height": f"{float(bbox.height) * 100}%",
+            })
+
         result = {
             "pageId": str(page.id),
             "ref": page.ref,
             "sefaria_ref": page.effective_sefaria_ref(),
-            "blocks": [block.to_dict() for block in (page.blocks or [])],
+            "pdfUrl": page.source_pdf,
+            "boxes": boxes,
+            "anchors": [],
         }
 
         cache.set(cache_key, result, 3600)
         return result
     except Exception:
+        logger.exception('get_for_sref failed for %s', sefaria_ref)
         return None
 
 

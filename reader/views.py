@@ -77,7 +77,7 @@ def page_view(request, ref):
     return render(request, 'reader.html', {
         'lang': lang,
         'direction': _dir(lang),
-        'component': json.dumps('PageReader'),
+        'component': json.dumps('PDFReader'),
         'props': json.dumps({**page_data, 'lang': lang}),
         'page_title': title,
         'page_description': f"Study {ref} with linked commentaries on TzuratLink",
@@ -128,6 +128,24 @@ def tractate_api(request, name):
     except Exception as e:
         return JsonResponse({'tractate': name, 'amudim': [], 'error': str(e)})
 
+
+
+def render_page(request, ref):
+    """Return a cropped PNG of the page rendered server-side via PyMuPDF."""
+    if request.method != 'GET':
+        return JsonResponse({'error': "Method not allowed"}, status=405)
+    from core.models import Page
+    from core.render import render_page_png
+    try:
+        page = Page.objects(ref=ref).first()
+        if not page:
+            return JsonResponse({'error': 'not found'}, status=404)
+        png = render_page_png(page)
+        resp = HttpResponse(png, content_type='image/png')
+        resp['Cache-Control'] = 'public, max-age=86400'
+        return resp
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 def reader_catchall(request, path=''):
@@ -193,12 +211,11 @@ def debug_page(request, ref):
         page = Page.objects(ref=ref).first()
         if not page:
             return JsonResponse({'error': 'not found', 'ref': ref})
-        line_count = sum(len(b.lines or []) for b in (page.blocks or []))
         return JsonResponse({
             'ref': page.ref,
             'sefaria_ref': page.effective_sefaria_ref(),
-            'block_count': len(page.blocks or []),
-            'line_count': line_count,
+            'source_pdf': page.source_pdf,
+            'bbox_count': len(page.bboxes or []),
             'id': str(page.id),
         })
     except Exception as e:

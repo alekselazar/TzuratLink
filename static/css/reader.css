@@ -275,32 +275,59 @@ header {
     text-decoration: underline;
 }
 
-.page-reader {
+.pdf-reader {
     display: flex;
     width: 100%;
     flex: 1;
     overflow: hidden;
 }
 
-.page-content {
+.reader-page-container {
     position: relative;
+    display: inline-block;
     max-width: 100%;
-    margin: 10px 20px;
+    margin: 20px;
 }
 
-.segment {
-    cursor: pointer;
+.reader-page-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.reader-page-container .boxes-layer,
+.reader-page-container .highlighted-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.reader-page-container .boxes-layer {
+    pointer-events: auto;
+}
+
+.reader-page-container .box {
+    pointer-events: auto;
+}
+
+.highlighted-box, .hover-box {
+    background-color: var(--talmud);
+    border: 1px solid var(--talmud);
+    box-sizing: border-box;
+    opacity: 0.2;
+    position: absolute;
+}
+
+.box {
+    position: absolute;
     transition: opacity .1s;
 }
 
-.segment--selected {
-    background-color: var(--talmud);
-    opacity: 0.2;
-}
-
-.segment--hovered {
-    background-color: var(--talmud);
-    opacity: 0.2;
+.boxes-layer {
+    z-index: 2;
 }
 
 .accordion {
@@ -731,9 +758,11 @@ body.library-page #app {
 }
 
 .page-copyright {
+    position: sticky;
     text-align: center;
     font-size: 11px;
     color: #888;
     padding: 6px 0;
-    border-top: 1px solid #e0e0e0;
+    bottom: -1px;
+    background-color: white;
 }
