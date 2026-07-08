@@ -194,3 +194,7 @@ if not DEBUG:
     # Set to True when a reverse proxy terminates HTTPS
     SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "false").lower() in ("1", "true", "yes")
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    # Health checks (K8s exec probes, docker-compose healthcheck) hit this path
+    # directly over plain HTTP from inside the container/pod, where there's no
+    # TLS listener — never redirect it, regardless of SECURE_SSL_REDIRECT.
+    SECURE_REDIRECT_EXEMPT = [r"^health/?$"]
