@@ -75,4 +75,4 @@ RUN python -c "open('manage.py','w').write('''#!/usr/bin/env python\nimport os,s
 RUN test -f tzuratlink/settings.py || cp tzuratlink/settings.example.py tzuratlink/settings.py
 
 EXPOSE 8000
-CMD ["sh", "-c", "cp -r /app/static/. /static/ 2>/dev/null || true && python manage.py migrate --noinput && python manage.py collectstatic --noinput && exec gunicorn tzuratlink.wsgi:application --bind 0.0.0.0:8000 --workers 2"]
+CMD ["sh", "-c", "cp -r /app/static/. /static/ 2>/dev/null || true && python manage.py wait_for_db && python manage.py migrate --noinput && python manage.py collectstatic --noinput && exec gunicorn tzuratlink.wsgi:application --bind 0.0.0.0:8000 --workers 2"]
