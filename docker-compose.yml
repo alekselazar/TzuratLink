@@ -23,8 +23,6 @@ services:
       - SECURE_SSL_REDIRECT=${SECURE_SSL_REDIRECT:-false}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - GDRIVE_CREDENTIALS=${GDRIVE_CREDENTIALS}
-      - GDRIVE_BACKUP_FOLDER_ID=${GDRIVE_BACKUP_FOLDER_ID}
     volumes:
       - static_files:/static
     depends_on:

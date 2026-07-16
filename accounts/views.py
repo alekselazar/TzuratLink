@@ -1,7 +1,6 @@
 import json
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.http import JsonResponse
-from core.backup import backup_async
 
 User = get_user_model()
 
@@ -40,7 +39,6 @@ def signup_view(request):
             user.save(update_fields=['first_name', 'last_name'])
 
         login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-        backup_async()
         return JsonResponse({
             'id': user.id,
             'email': user.email,

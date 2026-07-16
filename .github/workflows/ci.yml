@@ -29,8 +29,6 @@ jobs:
       SECURE_SSL_REDIRECT: ${{ secrets.SECURE_SSL_REDIRECT }}
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-      GDRIVE_BACKUP_FOLDER_ID: ${{ secrets.GDRIVE_BACKUP_FOLDER_ID }}
-      GDRIVE_CREDENTIALS: ${{ secrets.GDRIVE_CREDENTIALS_JSON }}
 
     steps:
       - uses: actions/checkout@v4
@@ -128,8 +126,6 @@ jobs:
             SECURE_SSL_REDIRECT=${{ secrets.SECURE_SSL_REDIRECT }}
             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-            GDRIVE_BACKUP_FOLDER_ID=${{ secrets.GDRIVE_BACKUP_FOLDER_ID }}
-            GDRIVE_CREDENTIALS=${{ secrets.GDRIVE_CREDENTIALS_JSON }}
 
       - name: Smoke test — verify the app actually boots inside the built image
         run: docker run --rm tzuratlink:ci python manage.py check

@@ -16,7 +16,7 @@ Our mission is to create a seamless bridge between the physical pages of the Tal
 
 ## Backend Architecture
 
-The Django-based backend of TzuratLink is designed to manage complex data structures, user interactions, and integrations with external APIs such as Sefaria. The frontend is a client-rendered React app (built with webpack, served as a static bundle); Google Drive backups and Google OAuth sign-in are also integrated.
+The Django-based backend of TzuratLink is designed to manage complex data structures, user interactions, and integrations with external APIs such as Sefaria. The frontend is a client-rendered React app (built with webpack, served as a static bundle); Google OAuth sign-in is also integrated.
 
 ## Deployment
 

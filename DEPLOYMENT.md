@@ -27,8 +27,6 @@ Required environment variables:
 | `REDIS_URL` | Redis URL (e.g. `redis://localhost:6379/0`) |
 | `GOOGLE_CLIENT_ID` | OAuth 2.0 client ID for Google sign-in (Google Cloud Console → Credentials) |
 | `GOOGLE_CLIENT_SECRET` | OAuth 2.0 client secret for Google sign-in |
-| `GDRIVE_CREDENTIALS` | Full Google service-account JSON key **content** (not a file path), used to back up `db.sqlite3` to Drive |
-| `GDRIVE_BACKUP_FOLDER_ID` | Google Drive folder ID that receives the DB backups |
 
 ## 2. Python app (Django)
 

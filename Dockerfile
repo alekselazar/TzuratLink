@@ -31,8 +31,6 @@ ARG SSR_SERVICE_URL=""
 ARG SECURE_SSL_REDIRECT="false"
 ARG GOOGLE_CLIENT_ID=""
 ARG GOOGLE_CLIENT_SECRET=""
-ARG GDRIVE_BACKUP_FOLDER_ID=""
-ARG GDRIVE_CREDENTIALS=""
 
 ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY} \
     DJANGO_DEBUG=${DJANGO_DEBUG} \
@@ -46,9 +44,7 @@ ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY} \
     SSR_SERVICE_URL=${SSR_SERVICE_URL} \
     SECURE_SSL_REDIRECT=${SECURE_SSL_REDIRECT} \
     GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} \
-    GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} \
-    GDRIVE_BACKUP_FOLDER_ID=${GDRIVE_BACKUP_FOLDER_ID} \
-    GDRIVE_CREDENTIALS=${GDRIVE_CREDENTIALS}
+    GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -67,4 +63,4 @@ RUN python -c "open('manage.py','w').write('''#!/usr/bin/env python\nimport os,s
 RUN test -f tzuratlink/settings.py || cp tzuratlink/settings.example.py tzuratlink/settings.py
 
 EXPOSE 8000
-CMD ["sh", "-c", "cp -r /app/static/. /static/ 2>/dev/null || true && python manage.py restore_db && python manage.py migrate --noinput && python manage.py collectstatic --noinput && exec gunicorn tzuratlink.wsgi:application --bind 0.0.0.0:8000 --workers 2"]
+CMD ["sh", "-c", "cp -r /app/static/. /static/ 2>/dev/null || true && python manage.py migrate --noinput && python manage.py collectstatic --noinput && exec gunicorn tzuratlink.wsgi:application --bind 0.0.0.0:8000 --workers 2"]
