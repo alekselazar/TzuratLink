@@ -73,10 +73,23 @@ TEMPLATES = [
     },
 ]
 
+# PostgreSQL — shared across all app replicas (unlike the old per-pod-local
+# SQLite file), so sessions/auth data stay consistent no matter which replica
+# handles a given request.
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("POSTGRES_NAME", "tzuratlink"),
+        "USER": os.environ.get("POSTGRES_USER", "postgres"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
+        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+        "OPTIONS": {
+            # "prefer" works for both a local/self-hosted Postgres with no TLS
+            # and a managed provider that requires it, without needing to know
+            # which in advance.
+            "sslmode": os.environ.get("POSTGRES_SSLMODE", "prefer"),
+        },
     }
 }
 

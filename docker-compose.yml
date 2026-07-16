@@ -1,4 +1,4 @@
-# TzuratLink – Docker deployment: Django, Redis. Reverse proxy is managed outside this stack.
+# TzuratLink – Docker deployment: Django, Postgres, Redis. Reverse proxy is managed outside this stack.
 # Mongo: use MongoDB Atlas (set MONGODB_* in .env). No mongo container.
 
 services:
@@ -14,6 +14,11 @@ services:
       - DJANGO_DEBUG=${DJANGO_DEBUG:-false}
       - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
       - SITE_URL=${SITE_URL:-http://localhost:8000}
+      - POSTGRES_NAME=${POSTGRES_NAME:-tzuratlink}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
       - MONGODB_NAME=${MONGODB_NAME:-tzuratlink}
       - MONGODB_HOST=${MONGODB_HOST}
       - MONGODB_USER=${MONGODB_USER}
@@ -26,6 +31,7 @@ services:
     volumes:
       - static_files:/static
     depends_on:
+      postgres: { condition: service_healthy }
       redis: { condition: service_healthy }
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"]
@@ -33,6 +39,22 @@ services:
       timeout: 5s
       retries: 3
       start_period: 30s
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: tzuratlink-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_NAME:-tzuratlink}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7-alpine
@@ -48,4 +70,5 @@ services:
 
 volumes:
   static_files:
+  postgres_data:
   redis_data:

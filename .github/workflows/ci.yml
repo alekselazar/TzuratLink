@@ -16,10 +16,30 @@ jobs:
     name: Django Tests
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: tzuratlink_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     env:
       DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
       DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
       DJANGO_ALLOWED_HOSTS: ${{ secrets.DJANGO_ALLOWED_HOSTS }}
+      POSTGRES_NAME: tzuratlink_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
       MONGODB_NAME: ${{ secrets.MONGODB_NAME }}
       MONGODB_HOST: ${{ secrets.MONGODB_HOST }}
       MONGODB_USER: ${{ secrets.MONGODB_USER }}
@@ -117,6 +137,11 @@ jobs:
             DJANGO_DEBUG=${{ secrets.DJANGO_DEBUG }}
             DJANGO_ALLOWED_HOSTS=${{ secrets.DJANGO_ALLOWED_HOSTS }}
             SITE_URL=${{ secrets.SITE_URL }}
+            POSTGRES_NAME=${{ secrets.POSTGRES_NAME }}
+            POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+            POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+            POSTGRES_HOST=${{ secrets.POSTGRES_HOST }}
+            POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}
             MONGODB_NAME=${{ secrets.MONGODB_NAME }}
             MONGODB_HOST=${{ secrets.MONGODB_HOST }}
             MONGODB_USER=${{ secrets.MONGODB_USER }}
