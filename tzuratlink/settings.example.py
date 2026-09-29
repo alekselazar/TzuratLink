@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "core",
     "reader",
     "accounts",
+    "ai_chavruta",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -126,6 +127,10 @@ else:
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         }
     }
+
+# AI Chavruta (ai_chavruta app) — OpenAI-backed LangGraph chat assistant
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
+AI_CHAVRUTA_MODEL = os.environ.get("AI_CHAVRUTA_MODEL", "gpt-4o-mini")
 
 # django-allauth (Google OAuth social login; see accounts app)
 SITE_ID = 1
