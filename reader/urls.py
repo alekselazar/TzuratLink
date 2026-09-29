@@ -11,6 +11,7 @@ urlpatterns = [
     path('tractate/<str:name>', views.tractate_view, name='tractate_view'),
     path('api/tractate/<str:name>', views.tractate_api, name='tractate_api'),
     path('api/page/<path:ref>', views.get_page_data, name='get_page_data'),
+    path('api/sefaria/<path:ref>', views.sefaria_ref_data, name='sefaria_ref_data'),
     path('api/render/<path:ref>', views.render_page, name='render_page'),
     path('api/library', views.library_api, name='library_api'),
     path('api/next/<path:ref>', views.get_next_page, name='get_next_page'),

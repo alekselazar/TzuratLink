@@ -8,6 +8,7 @@ from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 
 from core.utils import get_for_sref, get_sefaria_seo_text
+from core.sefaria import get_text_v3, get_links
 
 
 def _lang(request):
@@ -159,6 +160,20 @@ def get_page_data(request, ref):
     if page_data is None:
         return JsonResponse({'error': "Page not found"}, status=404)
     return JsonResponse(page_data)
+
+
+def sefaria_ref_data(request, ref):
+    """
+    Cache-first proxy for a single Sefaria ref's text + linked commentaries,
+    so the reader UI (and ai_chavruta) never call sefaria.org directly from
+    the browser — every lookup goes through Django's Redis cache.
+    """
+    if request.method != 'GET':
+        return JsonResponse({'error': "Method not allowed"}, status=405)
+    return JsonResponse({
+        'text': get_text_v3(ref),
+        'links': get_links(ref),
+    })
 
 
 def library_api(request):

@@ -67,12 +67,12 @@ const ReaderRefsPanel = () => {
         setLinks({});
 
         const fetchAll = async () => {
-            const textRes = await fetch(
-                `https://www.sefaria.org/api/v3/texts/${sefariaRef}?return_format=text_only`
-            );
-            if (!textRes.ok) throw new Error('Failed to fetch text');
-            const textData = await textRes.json();
-            if (textData.error) throw new Error(textData.error);
+            const res = await fetch(`/api/sefaria/${sefariaRef}`);
+            if (!res.ok) throw new Error('Failed to fetch sefaria data');
+            const data = await res.json();
+
+            const textData = data.text;
+            if (!textData) throw new Error('Failed to fetch text');
 
             const version = textData.versions?.[0];
             const versionLang = version?.language ?? 'he';
@@ -82,10 +82,7 @@ const ReaderRefsPanel = () => {
             setText(version?.text ?? '');
             setTextLang(versionLang);
 
-            const refsRes = await fetch(`https://www.sefaria.org/api/links/${sefariaRef}`);
-            if (!refsRes.ok) throw new Error('Failed to fetch links');
-            const refsData = await refsRes.json();
-            if (refsData.error) throw new Error(refsData.error);
+            const refsData = data.links || [];
 
             const newLinks = {};
             refsData.forEach(link => {
