@@ -11,6 +11,7 @@ whitenoise==6.7.0
 PyMuPDF==1.24.14
 
 # ai_chavruta (AI Chavruta chat assistant)
+beautifulsoup4==4.12.3
 langchain==1.4.1
 langchain-core==1.6.3
 langchain-openai==1.6.2

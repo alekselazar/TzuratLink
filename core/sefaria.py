@@ -45,15 +45,19 @@ def _cached_fetch(cache_key, url):
         return None
 
 
-def get_text_v3(ref):
+def get_text_v3(ref, version=None):
     """
     Fetches a ref's text via Sefaria's v3 texts API (the version/text-only
-    shape the reader UI renders). Returns the parsed JSON dict, or None if
-    unavailable.
+    shape the reader UI renders). `version` selects a specific translation,
+    e.g. "english|William Davidson Edition - English" — otherwise Sefaria
+    returns its default (primary source-language) version. Returns the
+    parsed JSON dict, or None if unavailable.
     """
     encoded_ref = urllib.parse.quote(ref)
-    cache_key = f"sefaria:text_v3:{ref}"
+    cache_key = f"sefaria:text_v3:{ref}:{version or 'default'}"
     url = f"https://www.sefaria.org/api/v3/texts/{encoded_ref}?return_format=text_only"
+    if version:
+        url += f"&version={urllib.parse.quote(version)}"
     return _cached_fetch(cache_key, url)
 
 
