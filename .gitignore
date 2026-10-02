@@ -3,6 +3,7 @@ __pycache__/
 migrations/
 static/js/
 node/coverage/
+venv/
 
 .env
 *.sqlite3
