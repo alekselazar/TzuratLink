@@ -1,5 +1,9 @@
+from django.urls import path
+
+from . import views
+
 app_name = "ai_chavruta"
 
 urlpatterns = [
-    # POST /api/chavruta/chat/ — added in Phase 4
+    path("chat/", views.chat, name="chat"),
 ]
