@@ -25,9 +25,8 @@ def classify_intent(state: ChavrutaState) -> dict:
         f"Question: {state['question']}"
     )
 
-    model = get_chat_model(temperature=0).with_structured_output(IntentClassification)
-
     try:
+        model = get_chat_model(temperature=0).with_structured_output(IntentClassification)
         result: IntentClassification = model.invoke([
             SystemMessage(content=CLASSIFIER_PROMPT),
             HumanMessage(content=user_content),

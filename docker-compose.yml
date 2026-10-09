@@ -28,6 +28,8 @@ services:
       - SECURE_SSL_REDIRECT=${SECURE_SSL_REDIRECT:-false}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - AI_CHAVRUTA_MODEL=${AI_CHAVRUTA_MODEL:-gpt-4o-mini}
     volumes:
       - static_files:/static
     depends_on:

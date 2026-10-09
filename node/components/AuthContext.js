@@ -4,14 +4,14 @@ const AuthContext = createContext(null);
 
 export const useAuth = () => useContext(AuthContext);
 
-function getCsrf() {
+export function getCsrf() {
     const meta = typeof document !== 'undefined'
         ? document.querySelector('meta[name="csrf-token"]')
         : null;
     return meta ? meta.content : '';
 }
 
-async function authFetch(url, options = {}) {
+export async function authFetch(url, options = {}) {
     const res = await fetch(url, {
         ...options,
         headers: {

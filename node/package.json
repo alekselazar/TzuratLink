@@ -12,10 +12,11 @@
     "@babel/plugin-syntax-jsx": "^7.23.0",
     "@babel/preset-env": "^7.23.0",
     "@babel/preset-react": "^7.23.0",
+    "pdfjs-dist": "^4.9.155",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-markdown": "^10.1.0",
     "react-modal": "^3.16.1",
-    "pdfjs-dist": "^4.9.155",
     "react-router-dom": "^6.20.0"
   },
   "devDependencies": {

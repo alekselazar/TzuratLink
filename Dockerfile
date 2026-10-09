@@ -37,6 +37,7 @@ ARG SSR_SERVICE_URL=""
 ARG SECURE_SSL_REDIRECT="false"
 ARG GOOGLE_CLIENT_ID=""
 ARG GOOGLE_CLIENT_SECRET=""
+ARG OPENAI_API_KEY=""
 
 ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY} \
     DJANGO_DEBUG=${DJANGO_DEBUG} \
@@ -56,7 +57,8 @@ ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY} \
     SSR_SERVICE_URL=${SSR_SERVICE_URL} \
     SECURE_SSL_REDIRECT=${SECURE_SSL_REDIRECT} \
     GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID} \
-    GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+    GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET} \
+    OPENAI_API_KEY=${OPENAI_API_KEY}
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
@@ -64,6 +66,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY core/ ./core/
 COPY reader/ ./reader/
 COPY accounts/ ./accounts/
+COPY ai_chavruta/ ./ai_chavruta/
 COPY templates/ ./templates/
 COPY static/ ./static/
 COPY tzuratlink/ ./tzuratlink/

@@ -49,6 +49,7 @@ jobs:
       SECURE_SSL_REDIRECT: ${{ secrets.SECURE_SSL_REDIRECT }}
       GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     steps:
       - uses: actions/checkout@v4
@@ -151,6 +152,7 @@ jobs:
             SECURE_SSL_REDIRECT=${{ secrets.SECURE_SSL_REDIRECT }}
             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
 
       - name: Smoke test — verify the app actually boots inside the built image
         run: docker run --rm tzuratlink:ci python manage.py check

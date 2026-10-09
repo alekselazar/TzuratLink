@@ -27,6 +27,8 @@ Required environment variables:
 | `REDIS_URL` | Redis URL (e.g. `redis://localhost:6379/0`) |
 | `GOOGLE_CLIENT_ID` | OAuth 2.0 client ID for Google sign-in (Google Cloud Console → Credentials) |
 | `GOOGLE_CLIENT_SECRET` | OAuth 2.0 client secret for Google sign-in |
+| `OPENAI_API_KEY` | OpenAI API key — required for the AI Chavruta chat assistant (`/api/chavruta/chat/`) to work |
+| `AI_CHAVRUTA_MODEL` | Optional; OpenAI model used by the chat assistant (defaults to `gpt-4o-mini`) |
 
 ## 2. Python app (Django)
 

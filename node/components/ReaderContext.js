@@ -19,16 +19,18 @@ export const ReaderStateProvider = ({ pageRef, pageId, pdfUrl, boxes, anchors, i
     const [sefariaRef, setSefariaRef] = useState(() => boxes?.[0]?.ref || '');
     const [highlightedBoxes, setHighlightedBoxes] = useState([]);
     const [existingBoxes, setExistingBoxes] = useState(boxes);
+    const [chatOpen, setChatOpen] = useState(false);
 
     const contextValue = useMemo(() => ({
         pageRef,
         sefariaRef, setSefariaRef,
         highlightedBoxes, setHighlightedBoxes,
         existingBoxes, setExistingBoxes,
+        chatOpen, setChatOpen,
         idRef,
         lang,
         pdfUrl,
-    }), [pageRef, sefariaRef, highlightedBoxes, existingBoxes, pdfUrl]);
+    }), [pageRef, sefariaRef, highlightedBoxes, existingBoxes, chatOpen, pdfUrl]);
 
     return (
         <ReaderContext.Provider value={contextValue}>

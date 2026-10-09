@@ -3,19 +3,47 @@ import { useParams } from 'react-router-dom';
 import { ReaderStateProvider, useReaderState } from './ReaderContext';
 import ReaderPDFView from './ReaderPDFView';
 import ReaderRefsPanel from './ReaderRefsPanel';
+import ChatPanel from './ChatPanel';
+
+const PANE_TRANSITION = 'flex-basis 0.3s ease-in-out, opacity 0.3s ease-in-out';
 
 const PDFLayout = ({ lang }) => {
     const sefariaRef = useReaderState((ctx) => ctx.sefariaRef);
+    const pageRef = useReaderState((ctx) => ctx.pageRef);
+    const chatOpen = useReaderState((ctx) => ctx.chatOpen);
+    const setChatOpen = useReaderState((ctx) => ctx.setChatOpen);
+
+    let leftPct = 100;
+    let rightPct = 0;
+    if (chatOpen) {
+        leftPct = 50;
+        rightPct = 50;
+    } else if (sefariaRef) {
+        leftPct = 75;
+        rightPct = 25;
+    }
+
     return (
         <div className="pdf-reader" style={{ direction: lang === 'en' ? 'ltr' : 'rtl' }}>
-            <div style={{ flex: sefariaRef ? '0 0 75%' : '0 0 100%', position: 'relative', transition: 'flex-basis 0.3s', overflowY: 'auto' }}>
+            <div style={{ flex: `0 0 ${leftPct}%`, position: 'relative', transition: PANE_TRANSITION, overflowY: 'auto' }}>
                 <ReaderPDFView />
                     <div className="page-copyright">
                         © All rights reserved to Vageshel. Content retrieved from Daf Yomi portal.
                     </div>
             </div>
-            <div style={{ flex: '0 0 25%', display: sefariaRef ? 'flex' : 'none', flexDirection: 'column', overflow: 'hidden' }}>
-                <ReaderRefsPanel />
+            <div style={{
+                flex: `0 0 ${rightPct}%`,
+                opacity: rightPct ? 1 : 0,
+                transition: PANE_TRANSITION,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+            }}>
+                {chatOpen ? (
+                    <ChatPanel dafRef={decodeURIComponent(pageRef)} lang={lang} onClose={() => setChatOpen(false)} />
+                ) : sefariaRef ? (
+                    <ReaderRefsPanel />
+                ) : null}
             </div>
         </div>
     );

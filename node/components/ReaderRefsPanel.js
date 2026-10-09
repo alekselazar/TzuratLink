@@ -46,6 +46,7 @@ const ReaderRefsPanel = () => {
     const pageRef = useReaderState((ctx) => ctx.pageRef);
     const sefariaRef = useReaderState((ctx) => ctx.sefariaRef);
     const setSefariaRef = useReaderState((ctx) => ctx.setSefariaRef);
+    const setChatOpen = useReaderState((ctx) => ctx.setChatOpen);
     const lang = useReaderState((ctx) => ctx.lang);
     const navigate = useNavigate();
 
@@ -120,6 +121,13 @@ const ReaderRefsPanel = () => {
                 >
                     {title || sefariaRef}
                 </span>
+                <button
+                    className="chat-open-btn"
+                    onClick={() => setChatOpen(true)}
+                    title="Ask the Chavruta"
+                >
+                    {lang.current.startsWith('en') ? 'Ask the Chavruta' : 'שאל את החברותא'}
+                </button>
                 <button
                     className="refs-close-btn"
                     onClick={() => setSefariaRef('')}

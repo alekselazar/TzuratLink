@@ -1,6 +1,6 @@
 import json
 
-from django.http import JsonResponse
+from django.http import JsonResponse, StreamingHttpResponse
 
 from .services.chat_service import ChatRequest, ChavrutaChatService
 
@@ -18,8 +18,8 @@ def chat(request):
 
     # daf_ref/question validation is the graph's job (validate_request node)
     # so every failure mode — missing fields, a malformed daf_ref, an LLM
-    # outage — surfaces through the same {"answer": "..."} shape, rather
-    # than the frontend having to handle two different error formats.
+    # outage — surfaces through the same event stream, rather than the
+    # frontend having to handle a separate error format.
     chat_request = ChatRequest(
         user_id=request.user.id if request.user.is_authenticated else None,
         daf_ref=(data.get('daf_ref') or '').strip(),
@@ -28,5 +28,11 @@ def chat(request):
         explicit_mode=data.get('mode') or None,
     )
 
-    result = _chat_service.invoke(chat_request)
-    return JsonResponse(result)
+    def event_stream():
+        for event in _chat_service.stream(chat_request):
+            yield json.dumps(event) + "\n"
+
+    response = StreamingHttpResponse(event_stream(), content_type='application/x-ndjson')
+    response['Cache-Control'] = 'no-cache'
+    response['X-Accel-Buffering'] = 'no'  # don't let a reverse proxy buffer this away
+    return response
