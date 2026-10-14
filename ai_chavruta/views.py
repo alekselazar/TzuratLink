@@ -11,6 +11,9 @@ def chat(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'Method not allowed'}, status=405)
 
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
@@ -21,7 +24,7 @@ def chat(request):
     # outage — surfaces through the same event stream, rather than the
     # frontend having to handle a separate error format.
     chat_request = ChatRequest(
-        user_id=request.user.id if request.user.is_authenticated else None,
+        user_id=request.user.id,
         daf_ref=(data.get('daf_ref') or '').strip(),
         question=(data.get('question') or '').strip(),
         session_id=data.get('session_id') or None,

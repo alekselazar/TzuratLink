@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { getCsrf } from './AuthContext';
+import { getCsrf, useAuth } from './AuthContext';
 
 const SESSION_STORAGE_PREFIX = 'chavruta_session:';
 
@@ -20,6 +21,7 @@ const replaceLastMessage = (prev, content) => {
 const ChatPanel = ({ dafRef, lang, onClose }) => {
     const isRtl = lang !== 'en';
     const storageKey = SESSION_STORAGE_PREFIX + dafRef;
+    const { user, loading: authLoading } = useAuth();
 
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
@@ -115,43 +117,67 @@ const ChatPanel = ({ dafRef, lang, onClose }) => {
                 <button className="refs-close-btn" onClick={onClose} title="Close">×</button>
             </div>
 
-            <div className="chat-messages">
-                {messages.length === 0 && (
+            {authLoading ? (
+                <div className="chat-messages">
+                    <div className="page-spinner" style={{ margin: 'auto' }} />
+                </div>
+            ) : !user ? (
+                <div className="chat-messages">
                     <div className="chat-empty-hint">
                         {isRtl
-                            ? 'שאל אותי כל דבר על הדף — סיכום, הסבר, תרגום, או השוואת שיטות.'
-                            : 'Ask me anything about this daf — a summary, an explanation, a translation, or a comparison of commentators.'}
+                            ? 'יש להתחבר כדי לשוחח עם החברותא.'
+                            : 'Sign in to chat with the Chavruta.'}
+                        <br /><br />
+                        <Link className="user-nav__link user-nav__link--signup" to="/login">
+                            {isRtl ? 'התחברות' : 'Sign in'}
+                        </Link>
+                        {'  '}
+                        <Link className="user-nav__link" to="/signup">
+                            {isRtl ? 'הרשמה' : 'Sign up'}
+                        </Link>
                     </div>
-                )}
-                {messages.map((m, i) => (
-                    <div key={i} className={`chat-message chat-message--${m.role}`}>
-                        {m.role === 'assistant' && !m.content && sending ? (
-                            <div className="page-spinner" />
-                        ) : m.role === 'assistant' ? (
-                            <div className="chat-markdown">
-                                <ReactMarkdown>{m.content}</ReactMarkdown>
+                </div>
+            ) : (
+                <>
+                    <div className="chat-messages">
+                        {messages.length === 0 && (
+                            <div className="chat-empty-hint">
+                                {isRtl
+                                    ? 'שאל אותי כל דבר על הדף — סיכום, הסבר, תרגום, או השוואת שיטות.'
+                                    : 'Ask me anything about this daf — a summary, an explanation, a translation, or a comparison of commentators.'}
                             </div>
-                        ) : (
-                            <p>{m.content}</p>
                         )}
+                        {messages.map((m, i) => (
+                            <div key={i} className={`chat-message chat-message--${m.role}`}>
+                                {m.role === 'assistant' && !m.content && sending ? (
+                                    <div className="page-spinner" />
+                                ) : m.role === 'assistant' ? (
+                                    <div className="chat-markdown">
+                                        <ReactMarkdown>{m.content}</ReactMarkdown>
+                                    </div>
+                                ) : (
+                                    <p>{m.content}</p>
+                                )}
+                            </div>
+                        ))}
+                        <div ref={bottomRef} />
                     </div>
-                ))}
-                <div ref={bottomRef} />
-            </div>
 
-            <div className="chat-input-row">
-                <textarea
-                    className="chat-input"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={onKeyDown}
-                    placeholder={isRtl ? 'הקלד שאלה...' : 'Type a question...'}
-                    rows={2}
-                />
-                <button className="chat-send-btn" onClick={send} disabled={sending || !input.trim()}>
-                    {isRtl ? 'שלח' : 'Send'}
-                </button>
-            </div>
+                    <div className="chat-input-row">
+                        <textarea
+                            className="chat-input"
+                            value={input}
+                            onChange={(e) => setInput(e.target.value)}
+                            onKeyDown={onKeyDown}
+                            placeholder={isRtl ? 'הקלד שאלה...' : 'Type a question...'}
+                            rows={2}
+                        />
+                        <button className="chat-send-btn" onClick={send} disabled={sending || !input.trim()}>
+                            {isRtl ? 'שלח' : 'Send'}
+                        </button>
+                    </div>
+                </>
+            )}
         </div>
     );
 };
