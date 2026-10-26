@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tzuratlink-config
+  namespace: tzuratlink
+data:
+  DJANGO_DEBUG: "false"
+  DJANGO_ALLOWED_HOSTS: "tzuratlink.org,tzuratlink.online,www.tzuratlink.org,www.tzuratlink.online"
+  SITE_URL: "https://tzuratlink.org"
+  POSTGRES_NAME: "tzuratlink"
+  POSTGRES_USER: "postgres"
+  POSTGRES_HOST: "postgres"
+  POSTGRES_PORT: "5432"
+  POSTGRES_SSLMODE: "disable"
+  MONGODB_NAME: "tzuratlink"
+  REDIS_URL: "redis://redis:6379/0"
+  SECURE_SSL_REDIRECT: "true"
