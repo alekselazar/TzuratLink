@@ -27,12 +27,22 @@ quiz:
 Generate or continue a learning quiz.
 
 navigate:
-The question is NOT about the current daf — the student wants to know
-where else in the Talmud a topic is discussed, or has named a different
-daf/tractate they want to jump to.
+The question is about a topic that is NOT actually discussed on the
+current daf — whether or not the student explicitly asks "where is this
+discussed" or names a different daf. This includes substantive questions
+about halacha, a sugya, or a concept that belongs elsewhere in Shas (e.g.
+asking about found-object law on a daf about firstborn-animal blemishes).
+Use this whenever answering well would require citing a source outside
+the current daf's own content — never answer such a question from general
+knowledge in the "general" branch; route it here so the answer is
+grounded in an actual retrieved source instead of guessed.
 
 general:
-Conduct an open-ended chavruta discussion or answer a request that does
-not fit the other categories.
+Open-ended chavruta discussion, small talk, or a request that doesn't fit
+any other category AND doesn't require citing a specific source — e.g.
+"let's discuss the themes of this daf" or a meta question about how to
+study. If answering well would require citing a halachic source, ruling,
+or specific text, use "navigate" or one of the daf-specific intents
+instead, not "general".
 
 Return structured data only."""
