@@ -49,9 +49,11 @@ const PDFLayout = ({ lang }) => {
     );
 };
 
-const PDFReader = ({ pageId, pdfUrl, boxes, anchors, initialRef, initialLanguage }) => {
+const PDFReader = ({ pageId, pdfUrl, boxes, anchors, available, initialRef, initialLanguage }) => {
     const params = useParams();
-    const [providerProps, setProviderProps] = useState({ pageId, pdfUrl, boxes: boxes || [], anchors: anchors || [] });
+    const [providerProps, setProviderProps] = useState({
+        pageId, pdfUrl, boxes: boxes || [], anchors: anchors || [], available,
+    });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 

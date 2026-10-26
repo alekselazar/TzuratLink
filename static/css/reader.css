@@ -456,6 +456,37 @@ header {
     cursor: not-allowed;
 }
 
+.chat-navigate-btn {
+    display: block;
+    margin-top: 8px;
+    background: #fff;
+    border: 1px solid #18345d;
+    color: #18345d;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.chat-navigate-btn:hover {
+    background: #18345d;
+    color: #fff;
+}
+
+.page-scan-pending-banner {
+    margin: 40px auto;
+    max-width: 420px;
+    padding: 20px 24px;
+    background: #f0ede0;
+    border: 1px solid #d8d2b8;
+    border-radius: 8px;
+    color: #444;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: center;
+}
+
 .reader-page-container {
     position: relative;
     display: inline-block;

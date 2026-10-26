@@ -7,6 +7,7 @@ from django.core.cache import cache
 from django.utils.html import strip_tags
 
 from .models import Page
+from .sefaria import get_text_v3
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,12 @@ def get_for_sref(sefaria_ref):
     """
     Returns page data formatted for the frontend renderer.
     Uses Redis cache to speed up repeated requests.
-    Returns None if page not found.
+
+    If there's no PDF-scan mapping (Page document) for this ref yet, falls
+    back to a text-only result (available=False) as long as the ref is a
+    real Sefaria text — the reader shows that daf without the scan overlay
+    instead of a hard 404, since most of Shas hasn't been scanned/mapped
+    yet. Returns None only if the ref doesn't resolve to real text at all.
     """
     cache_key = f'page_data:{sefaria_ref}'
     cached = cache.get(cache_key)
@@ -43,7 +49,19 @@ def get_for_sref(sefaria_ref):
     try:
         page = Page.objects(ref=sefaria_ref).first()
         if not page:
-            return None
+            if not get_text_v3(sefaria_ref):
+                return None
+            result = {
+                "pageId": None,
+                "ref": sefaria_ref,
+                "sefaria_ref": sefaria_ref,
+                "pdfUrl": None,
+                "boxes": [],
+                "anchors": [],
+                "available": False,
+            }
+            cache.set(cache_key, result, 3600)
+            return result
 
         boxes = []
         for bbox in page.bboxes or []:
@@ -62,6 +80,7 @@ def get_for_sref(sefaria_ref):
             "pdfUrl": page.source_pdf,
             "boxes": boxes,
             "anchors": [],
+            "available": True,
         }
 
         cache.set(cache_key, result, 3600)

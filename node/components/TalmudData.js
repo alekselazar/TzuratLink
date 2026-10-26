@@ -56,7 +56,9 @@ export const SEDARIM = [
             { en: 'Temurah', he: 'תמורה' },
             { en: 'Keritot', he: 'כריתות' },
             { en: 'Meilah', he: 'מעילה' },
+            { en: 'Kinim', he: 'קנים' },
             { en: 'Tamid', he: 'תמיד' },
+            { en: 'Middot', he: 'מדות' },
         ],
     },
     {
