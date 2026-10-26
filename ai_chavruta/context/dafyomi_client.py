@@ -240,7 +240,10 @@ def parse_insights_points(html):
     points = []
     current = None
 
-    for div in soup.find_all("div"):
+    # Some tractates (e.g. Sanhedrin, Bava Batra, Makkot) wrap each point in
+    # <p class="..."> directly instead of <div class="...">, no div wrapper
+    # at all — same classes, same flat sibling structure either way.
+    for div in soup.find_all(["div", "p"]):
         classes = div.get("class") or []
         cls = classes[0] if classes else ""
 
