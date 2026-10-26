@@ -13,6 +13,7 @@ class IntentClassification(BaseModel):
         "sources",
         "vocabulary",
         "quiz",
+        "navigate",
         "general",
     ]
     confidence: float = Field(ge=0, le=1)

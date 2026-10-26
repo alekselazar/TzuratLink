@@ -1,11 +1,17 @@
 node_modules/
 __pycache__/
 migrations/
+# ai_chavruta is the one app with real persisted Postgres models (the Shas
+# vector index) — its migrations need to ship to Docker/K8s to actually
+# create that table/extension, unlike every other app here.
+!ai_chavruta/migrations/
+!ai_chavruta/migrations/*.py
 static/js/
 node/coverage/
 venv/
 
 .env
+k8s/secrets.yaml
 *.sqlite3
 settings.py
 __init__.py

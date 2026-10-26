@@ -11,7 +11,11 @@ from .session_service import append_exchange, load_messages, new_session_id
 # Only these nodes' LLM output is user-facing text worth streaming to the
 # client — classify_intent also calls a model, but its structured-output
 # JSON isn't something a user should see token-by-token.
-_ANSWER_NODES = {"answer_summary", "answer_explanation", "answer_general"}
+_ANSWER_NODES = {
+    "answer_summary", "answer_explanation", "answer_translation",
+    "answer_rishonim", "answer_halacha", "answer_sources",
+    "answer_vocabulary", "answer_quiz", "answer_navigate", "answer_general",
+}
 
 
 @dataclass(frozen=True)
@@ -54,6 +58,7 @@ class ChavrutaChatService:
         final_answer = ""
         final_intent = initial_state.get("intent")
         final_error = None
+        final_navigate_suggestion = None
 
         for mode, payload in chavruta_graph.stream(initial_state, stream_mode=["messages", "updates"]):
             if mode == "messages":
@@ -70,8 +75,15 @@ class ChavrutaChatService:
                         final_error = node_output["error"]
                     if node_name == "finalize_answer":
                         final_answer = node_output.get("answer", "")
+                        final_navigate_suggestion = node_output.get("navigate_suggestion")
 
         if not final_error:
             append_exchange(session_id, request.daf_ref, request.question, final_answer, final_intent)
 
-        yield {"type": "done", "answer": final_answer, "intent": final_intent, "error": final_error}
+        yield {
+            "type": "done",
+            "answer": final_answer,
+            "intent": final_intent,
+            "error": final_error,
+            "navigate_suggestion": final_navigate_suggestion,
+        }

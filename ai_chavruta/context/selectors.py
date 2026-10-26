@@ -12,6 +12,9 @@ INTENT_CONTEXT_MAP = {
     "sources": ["gemara", "links", "halacha_topics"],
     "vocabulary": ["gemara", "vocabulary"],
     "quiz": ["gemara", "rashi", "tosafot", "insights", "vocabulary"],
+    # Deliberately empty: navigate is defined as "not about the current daf" —
+    # pulling in its context would contradict the intent and add noise/cost.
+    "navigate": [],
     "general": ["gemara", "rashi", "tosafot", "insights"],
 }
 

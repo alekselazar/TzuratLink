@@ -26,6 +26,11 @@ Explain words, phrases, grammar, or terminology.
 quiz:
 Generate or continue a learning quiz.
 
+navigate:
+The question is NOT about the current daf — the student wants to know
+where else in the Talmud a topic is discussed, or has named a different
+daf/tractate they want to jump to.
+
 general:
 Conduct an open-ended chavruta discussion or answer a request that does
 not fit the other categories.

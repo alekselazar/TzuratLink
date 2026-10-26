@@ -2,7 +2,14 @@ from langgraph.graph import END, START, StateGraph
 
 from .nodes.answer_explanation import answer_explanation
 from .nodes.answer_general import answer_general
+from .nodes.answer_halacha import answer_halacha
+from .nodes.answer_navigate import answer_navigate
+from .nodes.answer_quiz import answer_quiz
+from .nodes.answer_rishonim import answer_rishonim
+from .nodes.answer_sources import answer_sources
 from .nodes.answer_summary import answer_summary
+from .nodes.answer_translation import answer_translation
+from .nodes.answer_vocabulary import answer_vocabulary
 from .nodes.classify_intent import classify_intent
 from .nodes.finalize_answer import finalize_answer
 from .nodes.load_context import load_context
@@ -10,6 +17,19 @@ from .nodes.select_context import select_context
 from .nodes.validate_request import validate_request
 from .routing import after_load_context, after_validate, route_by_intent
 from .state import ChavrutaState
+
+_ANSWER_NODES = (
+    "answer_summary",
+    "answer_explanation",
+    "answer_translation",
+    "answer_rishonim",
+    "answer_halacha",
+    "answer_sources",
+    "answer_vocabulary",
+    "answer_quiz",
+    "answer_navigate",
+    "answer_general",
+)
 
 
 def build_chavruta_graph():
@@ -21,6 +41,13 @@ def build_chavruta_graph():
     graph.add_node("select_context", select_context)
     graph.add_node("answer_summary", answer_summary)
     graph.add_node("answer_explanation", answer_explanation)
+    graph.add_node("answer_translation", answer_translation)
+    graph.add_node("answer_rishonim", answer_rishonim)
+    graph.add_node("answer_halacha", answer_halacha)
+    graph.add_node("answer_sources", answer_sources)
+    graph.add_node("answer_vocabulary", answer_vocabulary)
+    graph.add_node("answer_quiz", answer_quiz)
+    graph.add_node("answer_navigate", answer_navigate)
     graph.add_node("answer_general", answer_general)
     graph.add_node("finalize_answer", finalize_answer)
 
@@ -43,14 +70,10 @@ def build_chavruta_graph():
     graph.add_conditional_edges(
         "select_context",
         route_by_intent,
-        {
-            "answer_summary": "answer_summary",
-            "answer_explanation": "answer_explanation",
-            "answer_general": "answer_general",
-        },
+        {node: node for node in _ANSWER_NODES},
     )
 
-    for node in ("answer_summary", "answer_explanation", "answer_general"):
+    for node in _ANSWER_NODES:
         graph.add_edge(node, "finalize_answer")
 
     graph.add_edge("finalize_answer", END)

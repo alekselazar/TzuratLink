@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { getCsrf, useAuth } from './AuthContext';
 
@@ -12,9 +12,9 @@ const appendToLastMessage = (prev, delta) => {
     return next;
 };
 
-const replaceLastMessage = (prev, content) => {
+const finalizeLastMessage = (prev, content, navigateSuggestion) => {
     const next = [...prev];
-    next[next.length - 1] = { ...next[next.length - 1], content };
+    next[next.length - 1] = { ...next[next.length - 1], content, navigateSuggestion: navigateSuggestion || null };
     return next;
 };
 
@@ -22,6 +22,7 @@ const ChatPanel = ({ dafRef, lang, onClose }) => {
     const isRtl = lang !== 'en';
     const storageKey = SESSION_STORAGE_PREFIX + dafRef;
     const { user, loading: authLoading } = useAuth();
+    const navigate = useNavigate();
 
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
@@ -87,14 +88,15 @@ const ChatPanel = ({ dafRef, lang, onClose }) => {
                     } else if (event.type === 'token') {
                         setMessages(prev => appendToLastMessage(prev, event.content));
                     } else if (event.type === 'done') {
-                        setMessages(prev => replaceLastMessage(prev, event.answer));
+                        setMessages(prev => finalizeLastMessage(prev, event.answer, event.navigate_suggestion));
                     }
                 }
             }
         } catch (err) {
-            setMessages(prev => replaceLastMessage(
+            setMessages(prev => finalizeLastMessage(
                 prev,
                 isRtl ? 'מצטער, קרתה תקלה. נסה שוב.' : 'Sorry, something went wrong. Please try again.',
+                null,
             ));
         } finally {
             setSending(false);
@@ -152,9 +154,21 @@ const ChatPanel = ({ dafRef, lang, onClose }) => {
                                 {m.role === 'assistant' && !m.content && sending ? (
                                     <div className="page-spinner" />
                                 ) : m.role === 'assistant' ? (
-                                    <div className="chat-markdown">
-                                        <ReactMarkdown>{m.content}</ReactMarkdown>
-                                    </div>
+                                    <>
+                                        <div className="chat-markdown">
+                                            <ReactMarkdown>{m.content}</ReactMarkdown>
+                                        </div>
+                                        {m.navigateSuggestion && (
+                                            <button
+                                                className="chat-navigate-btn"
+                                                onClick={() => navigate(`/page/${encodeURIComponent(m.navigateSuggestion.ref)}`)}
+                                            >
+                                                {isRtl
+                                                    ? `עבור אל ${m.navigateSuggestion.ref} ←`
+                                                    : `→ Go to ${m.navigateSuggestion.ref}`}
+                                            </button>
+                                        )}
+                                    </>
                                 ) : (
                                     <p>{m.content}</p>
                                 )}

@@ -13,13 +13,16 @@ def after_load_context(state: ChavrutaState) -> str:
     return "classify_intent"
 
 
-# Thin slice: only summary/explanation have dedicated branches so far.
-# Every other intent (translation/rishonim/halacha/sources/vocabulary/quiz/
-# general) falls back to the general chavruta-discussion node until its own
-# branch is built.
 def route_by_intent(state: ChavrutaState) -> str:
     routes = {
         "summary": "answer_summary",
         "explanation": "answer_explanation",
+        "translation": "answer_translation",
+        "rishonim": "answer_rishonim",
+        "halacha": "answer_halacha",
+        "sources": "answer_sources",
+        "vocabulary": "answer_vocabulary",
+        "quiz": "answer_quiz",
+        "navigate": "answer_navigate",
     }
     return routes.get(state.get("intent"), "answer_general")

@@ -131,6 +131,10 @@ else:
 # AI Chavruta (ai_chavruta app) — OpenAI-backed LangGraph chat assistant
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
 AI_CHAVRUTA_MODEL = os.environ.get("AI_CHAVRUTA_MODEL", "gpt-4o-mini")
+# Stronger model for branches needing real multi-source synthesis (rishonim/halacha)
+AI_CHAVRUTA_REASONING_MODEL = os.environ.get("AI_CHAVRUTA_REASONING_MODEL", "gpt-4o")
+# Embedding model for the Shas vector index (see ai_chavruta/retrieval + management/commands/index_shas.py)
+AI_CHAVRUTA_EMBEDDING_MODEL = os.environ.get("AI_CHAVRUTA_EMBEDDING_MODEL", "text-embedding-3-small")
 
 # django-allauth (Google OAuth social login; see accounts app)
 SITE_ID = 1

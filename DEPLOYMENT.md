@@ -28,7 +28,19 @@ Required environment variables:
 | `GOOGLE_CLIENT_ID` | OAuth 2.0 client ID for Google sign-in (Google Cloud Console → Credentials) |
 | `GOOGLE_CLIENT_SECRET` | OAuth 2.0 client secret for Google sign-in |
 | `OPENAI_API_KEY` | OpenAI API key — required for the AI Chavruta chat assistant (`/api/chavruta/chat/`) to work |
-| `AI_CHAVRUTA_MODEL` | Optional; OpenAI model used by the chat assistant (defaults to `gpt-4o-mini`) |
+| `AI_CHAVRUTA_MODEL` | Optional; OpenAI model used by most chat branches (defaults to `gpt-4o-mini`) |
+| `AI_CHAVRUTA_REASONING_MODEL` | Optional; stronger model used only for the rishonim/halacha branches (defaults to `gpt-4o`) |
+| `AI_CHAVRUTA_EMBEDDING_MODEL` | Optional; embedding model for the Shas vector index used by the navigate intent (defaults to `text-embedding-3-small`) |
+
+**Postgres requires the `pgvector` extension** (used to store/search Talmud passage embeddings for the navigate intent). The Docker/K8s Postgres image is `pgvector/pgvector:pg16` — a drop-in replacement for `postgres:16-alpine`, same Postgres major version. If running Postgres yourself outside this stack, install the `pgvector` extension before running migrations (`CREATE EXTENSION vector;` is applied automatically by Django's migration, but the extension's shared library must be present in the Postgres image/installation).
+
+After migrating, populate the vector index once with:
+
+```bash
+python manage.py index_shas
+```
+
+This walks all of Shas via the Sefaria API and embeds each amud's Davidson English text (a few thousand OpenAI embedding calls, well under $1, takes minutes). It's resumable — safe to re-run or interrupt.
 
 ## 2. Python app (Django)
 

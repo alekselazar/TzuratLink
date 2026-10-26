@@ -6,7 +6,7 @@ import logging
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from ...context.formatter import format_context_for_prompt
-from ...llm.factory import get_chat_model
+from ...llm.model_router import get_model_for_intent
 from ...prompts.base import BASE_CHAVRUTA_PROMPT
 from ..state import ChavrutaState
 
@@ -25,7 +25,7 @@ def run_answer_node(state: ChavrutaState, branch_prompt: str) -> dict:
     ]
 
     try:
-        response = get_chat_model().invoke(messages)
+        response = get_model_for_intent(state.get("intent")).invoke(messages)
     except Exception:
         logger.exception("Answer generation failed")
         return {"error": "The assistant is temporarily unavailable. Please try again."}

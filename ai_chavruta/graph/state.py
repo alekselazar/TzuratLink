@@ -11,6 +11,7 @@ ChavrutaIntent = Literal[
     "sources",
     "vocabulary",
     "quiz",
+    "navigate",
     "general",
 ]
 
@@ -37,6 +38,7 @@ class ChavrutaState(TypedDict):
 
     # Output
     answer: NotRequired[str]
+    navigate_suggestion: NotRequired[dict | None]
 
     # Control data
     error: NotRequired[str]
