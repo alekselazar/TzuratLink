@@ -18,6 +18,12 @@ __init__.py
 manage.py
 fix.py
 
+# The bare __init__.py rule above matches anywhere, including inside
+# ai_chavruta/migrations/ — but Django's migration loader requires that
+# directory to be a real package (checks __file__, which namespace
+# packages lack), so it needs to win over the blanket rule above it.
+!ai_chavruta/migrations/__init__.py
+
 # npm lockfile intentionally not committed (see bc7605addd5976746744fe49332d266df01b9d6d) —
 # CI and Docker both use `npm install`, not `npm ci`
 node/package-lock.json
